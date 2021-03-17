@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
     }
-  };
+  }
   Trabajador.init({
     nombre:{
       type: DataTypes.STRING,

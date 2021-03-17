@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
     }
-  };
+  }
   Sede.init({
     sedeId: {
       type: DataTypes.INTEGER,

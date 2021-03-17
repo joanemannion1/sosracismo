@@ -2,7 +2,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
 
-export default function CambiarContraseña() {
+export default function CambiarContrasena() {
     const {register, errors, handleSubmit} = useForm();
 
     const onSubmit = (data, e) => {

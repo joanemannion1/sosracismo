@@ -66,7 +66,7 @@ exports.getUsuarioWithDocumentacion = (request, result) => {
       result.send(data);
     }).catch(err => {
       result.status(500).send({
-        message: err.message || "Ha habido algun error descargando los datos."
+        message: err.message || "Ha habido algun error encontrando al usuario."
       });
     });
 };
