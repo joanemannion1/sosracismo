@@ -23,17 +23,18 @@ exports.create = (req, res) => {
         apellido2: req.body.data.apellido2,
         genero: req.body.data.genero,
         email: req.body.data.email,
-        telefono: req.body.data.telefono,
+        telefono: req.body.data.telefono ? req.body.data.telefono : null,
         direccion: req.body.data.direccion,
         localidad: req.body.data.localidad,
-        cp: req.body.data.cp,
+        cp: req.body.data.cp ? req.body.data.cp : null,
         provincia: req.body.data.provincia,
-        nacinoalidad: req.body.data.nacionalidad,
+        nacionalidad: req.body.data.nacionalidad,
         pais_origen: req.body.data.pais_origen,
         sedeId: req.body.data.sedeId,
         trabajadorId: req.body.data.trabajadorId,
     };
     
+    console.log(usuario);
     // Save Tutorial in the database
     Usuario.create(usuario)
         .then(data => {
