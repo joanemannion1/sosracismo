@@ -4,6 +4,8 @@ const Sequelize = require('sequelize');
 const { param } = require("../routes");
 const bcrypt = require('bcrypt');
 const BCRYPT_SALT_ROUNDS = 12;
+const jwt = require("jsonwebtoken");
+const config = require("../config/auth.config.js");
 
 // Create and Save a new Trabajador
 exports.create = (req, res) => {
@@ -96,7 +98,41 @@ exports.updatePasswordByEmail = (request, result) =>  {
 
 // Hacer Log In de un trabajador
 exports.logIn = (request, result) => {
-  
+  Trabajador.findOne({
+    where: {
+      email: request.body.email,
+    }
+  }).then(user => {
+      if (!user) {
+        return result.status(404).send({ message: "User Not found." });
+      }
+
+      var passwordIsValid = bcrypt.compareSync(
+        request.body.contraseña,
+        user.contraseña
+      );
+
+      if (!passwordIsValid) {
+        return result.status(401).send({
+          accessToken: null,
+          message: "Invalid Password!"
+        });
+      }
+
+      var token = jwt.sign({ nombre: user.nombre }, config.secret, {
+        expiresIn: 86400 // 24 hours
+      });
+
+      result.status(200).send({
+        nombre: user.nombre,
+        email: user.email,
+        sede: user.sedeId,
+        admin: user.admin,
+        accessToken: token
+      });
+    }).catch(err => {
+      result.status(500).send({ message: err.message });
+    });
 }
 // Delete a Trabajador with the specified id in the request
 exports.deleteTrabajadorByEmail = (request, result) => {

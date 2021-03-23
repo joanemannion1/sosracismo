@@ -10,12 +10,6 @@ const corsSettings = {
 server.use(express.json());
 server.use(express.urlencoded());
 
-const expressSession = require('express-session')({
-  secret: 'secret',
-  resave: false,
-  saveUninitialized: false
-});
-
 const api = require("./routes/index");
 
 server.use(cors(corsSettings));
@@ -32,6 +26,7 @@ server.use((req, res, next) => {
 server.get("/", (req, res) => {
   res.json({ message: "La base de datos esta en marcha." });
 });
+
 // set listening ports for request
 const port = process.env.PORT || 8080;
 

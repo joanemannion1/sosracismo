@@ -1,14 +1,27 @@
-import React from 'react';
+import React , { useState } from 'react';
 import logo from '../../images/logo192.png';
 import { useForm } from 'react-hook-form';
-//import axios from 'axios';
+import axios from 'axios';
+import history from '../../history';
 
 export default function LogIn() {
-    
+  
     const {register, errors, handleSubmit} = useForm();
 
     const onSubmit = (data, e) => {
-        console.log(data)
+        axios.post('http://localhost:8080/trabajador/login', {
+            email: data.email,
+            contraseña: data.contraseña
+        }).then(res => {
+            const token = res.data.accessToken;
+            localStorage.setItem('token', token);
+            localStorage.setItem('nombre', res.data.nombre);
+            localStorage.setItem('email', res.data.email);
+            localStorage.setItem('sedeId', res.data.sede);
+            history.push('/');
+            window.location.reload();
+        })
+
 
         // limpiar campos
         e.target.reset();
@@ -38,7 +51,12 @@ export default function LogIn() {
                         </span>
 
                         <label className="sr-only" >Contraseña</label>
-                        <input type="password" id="inputPassword" name="inputPassword" className="form-control" placeholder="Password" required/>
+                        <input type="password" id="inputPassword" name="contraseña" className="form-control" placeholder="Password" required ref={register({
+                            required: {
+                                value: true, 
+                                message: 'Conotraseña es requerido'
+                                }
+                            })}/>
                         <br/>
 
                         <button type="submit" className="btn btn-lg btn-primary btn-block" name="submitButton">Iniciar</button>
@@ -49,3 +67,4 @@ export default function LogIn() {
         </>
     )
 }
+

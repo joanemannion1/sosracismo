@@ -29,5 +29,7 @@ db.trabajadores.belongsTo(db.sedes, {foreignKey: 'sedeId', as: 'id_sede'})
 db.usuarios.belongsTo(db.sedes, {foreignKey: 'sedeId', as: 'id_sede'})
 db.usuarios.belongsTo(db.trabajadores, {foreignKey: 'trabajadorId', as: 'id_trabajador'})
 
+db.ROLES = ["trabajador", "admin"];
+
 module.exports = db;
 

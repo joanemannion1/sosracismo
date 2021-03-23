@@ -16,6 +16,8 @@ router.put("/trabajador/update", trabajador.updatePasswordByEmail);
 router.delete("/trabajador/delete/:email", trabajador.deleteTrabajadorByEmail);
 // Delete all trabajadores
 router.delete("/trabajadores/deleteAll", trabajador.deleteAllTrabajadores);
+//Log in trabajador
+router.post("/trabajador/login", trabajador.logIn);
 
 // Create New sede
 router.post("/sede/create", sede.create);
@@ -25,9 +27,11 @@ router.get("/sedes/all", sede.getAllSedes);
 // Create New User
 router.post("/usuario/create" ,usuario.create);
 // // Retrieve all Usuarios
-router.get("/usuarios/all", usuario.getAllUsuarios);
+router.get("/usuarios/all/:email", usuario.getAllUsuarios);
 // // Retrieve Usuario by n_documentacion
 router.put("/usuario/getByEmail", usuario.getUsuarioWithDocumentacion);
+// // Retrieve distinct nationalities
+router.get("/usuarios/nacionalidad/:email", usuario.getAllNationalities);
 
 
 module.exports = router;

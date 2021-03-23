@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import '../css/Navbar.css';
 import Dropdown from './Dropdown';
-
+import history from '../history';
 
 function Navbar() {
     const [click, setClick] = useState(false);
@@ -24,14 +24,19 @@ function Navbar() {
         if (window.innerWidth < 960) {
           setDropdown(false);
         } else {
-          setDropdown(false);
+          setDropdown(true);
         }
     };
     
+    const logout = () => {
+        localStorage.removeItem("token");
+        history.push('/LogIn');
+    }
 
     return (
         <>
             <nav className='navbar'>
+                <button type="button" onClick={logout}>Log out</button>
                 <Link to="/" className='navbar-logo' onClick={closeMobileMenu}>
                     Sos Racismo
                     <i className='fas fa-hand-paper' />
@@ -66,5 +71,7 @@ function Navbar() {
         </>
     );
 }
+
+
 
 export default Navbar;

@@ -49,15 +49,19 @@ exports.create = (req, res) => {
 };
 
 // Retrieve all Usuarios from the database.
-exports.getAllUsuarios = (_, result) => {
-    Usuario.findAll()
+exports.getAllUsuarios = (req, result) => {
+  const email = req.params.email;
+    Usuario.findAll({
+      where: {
+        trabajadorId : email
+      },
+      attributes: ['telefono', 'n_documentacion', 'nombre', 'apellido1', 'apellido2', 'telefono', 'email', 'nacionalidad', 'sedeId', 'genero', 'trabajadorId']
+  })
     .then(data => {
       result.send(data);
-    }).catch(err => {
-      result.status(500).send({
-        message: err.message || "Ha habido algun error descargando los datos."
-      });
-    });
+    }).catch( error => {
+      result.status( 400 ).send( error )
+    })
 };
 
 // Retrieve Usuario with n_documentacion from the database.
@@ -72,3 +76,17 @@ exports.getUsuarioWithDocumentacion = (request, result) => {
     });
 };
 
+//Retrieve different nationalities
+exports.getAllNationalities = (req, result) => {
+  const email = req.params.email;
+  Usuario.findAll({ where: {
+    trabajadorId : email
+  },
+  attributes: [[Sequelize.fn('DISTINCT', Sequelize.col('nacionalidad')) ,'nacionalidad']]})
+  .then(data => {
+    console.log(data);
+    result.send(data);
+  }).catch( error => {
+    result.status( 400 ).send( error )
+  })
+};
