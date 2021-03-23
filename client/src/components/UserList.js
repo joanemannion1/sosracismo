@@ -1,6 +1,5 @@
 import React from 'react';
 import { PlusCircleFill } from 'react-bootstrap-icons';
-import UserModal from './Modal';
 
 const UserList = ({userList=[]}) => {
     const [openModal, setOpenModal] = React.useState(false);

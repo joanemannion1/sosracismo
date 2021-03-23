@@ -4,7 +4,6 @@ import { Router, Switch, Route, Redirect } from 'react-router-dom';
 import React from 'react';
 
 //importar componentes
-import Navbar from './components/Navbar';
 import AñadirUsuario from './components/pages/AñadirUsuario';
 import VerUsuario from './components/pages/VerUsuario';
 import AñadirIntervencion from './components/pages/AñadirIntervencion';

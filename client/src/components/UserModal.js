@@ -1,6 +1,6 @@
 
 import { Button, Modal } from 'react-bootstrap';
-import React, { Component } from 'react';
+import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const UserModal = ({ data = {}, show = false }) => {

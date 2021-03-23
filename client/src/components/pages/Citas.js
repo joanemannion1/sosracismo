@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, momentLocalizer } from "react-big-calendar";
-import moment, { relativeTimeRounding } from "moment";
+import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import SweetAlert from "react-bootstrap-sweetalert";
 import DateObject from "react-date-object";
 import TextField from '@material-ui/core/TextField';
 import Autocomplete from '@material-ui/lab/Autocomplete';
@@ -45,7 +44,7 @@ export default function Citas() {
     });
     const classes = useStyles();
     const getUsers = async () => {
-        return await fetch('http://localhost:8080/usuarios/all/{email}'.replace('{email}', localStorage.email))
+        return fetch('http://localhost:8080/usuarios/all/{email}'.replace('{email}', localStorage.email))
             .then(response => response.json())
             .then(data => {
                 setUsuarios(data);
@@ -53,22 +52,11 @@ export default function Citas() {
             });
     }
 
-
-
-    const selectSlot = (slotInfo) => {
-        successAlert();
-    };
-
-    const hideAlert = () => {
-        setAlert(null);
-    }
-
     const handleInputChange = async (input) => {
         const filtered = usuariosDefault.filter(user => {
             const telefono = '' + (user.telefono ? user.telefono : ' ');
             return ((user.nombre.toLowerCase().includes(input.toLowerCase())) || (user.n_documentacion.toLowerCase().includes(input.toLowerCase())) || (telefono.includes(input.toLowerCase())));
         })
-        //  setInput(input);
         setUsuarios(filtered);
     }
     useEffect(() => { getUsers() }, []);
@@ -192,34 +180,6 @@ return (
             }}
             onSelectSlot={(slotInfo) => successAlert(slotInfo)}
             popup={true}
-        />
-        <Autocomplete
-            id="country-states-demo"
-            options={usuarios}
-            style={{ width: 300 }}
-            classes={{
-                option: classes.option,
-            }}
-            autoHighlight
-            filterOptions={x => x}
-            getOptionLabel={(option) => option.nombre}
-            renderOption={(option) => (
-                <React.Fragment>
-                    <span>{option.nombre}</span>
-                    {option.nombre} {option.apellido1} +{option.telefono}
-                </React.Fragment>
-            )}
-            renderInput={(params) => (
-                <TextField
-                    {...params}
-                    label="Escoge un usuario"
-                    variant="outlined"
-                    inputProps={{
-                        ...params.inputProps,
-                        autoComplete: 'new-password', // disable autocomplete and autofill
-                    }}
-                />
-            )}
         />
 
     </>

@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import UserList from '../UserList';
 import SearchBar from '../SearchBar'
-import UserModal from '../Modal';
 import { PlusCircleFill } from 'react-bootstrap-icons';
-import { Button, Modal, Container, Row, Col, Form } from 'react-bootstrap';
+import { Button, Modal, Container, Row, Col } from 'react-bootstrap';
 import ExportInformation from '../ExportInformation'
 export default function VerUsuario(filters) {
     const [usuarios, setUsuarios] = useState([]);

@@ -1,6 +1,5 @@
-import axios from 'axios';
 import React, { useState, useEffect } from 'react';
-import { AppBar, Toolbar, IconButton, Typography, Hidden, Drawer, Divider, CssBaseline, List, ListItem, ListItemIcon } from '@material-ui/core';
+import { AppBar, Toolbar, Typography, Drawer, CssBaseline, List, ListItem, ListItemIcon } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import Checkbox from '@material-ui/core/Checkbox';
 import ListItemText from '@material-ui/core/ListItemText';
@@ -11,7 +10,6 @@ import HomeWorkIcon from '@material-ui/icons/HomeWork';
 import Collapse from '@material-ui/core/Collapse';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
-import { Button} from 'react-bootstrap';
 
 const drawerWidth = 240;
 
@@ -38,7 +36,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function ClippedDrawer() {
+export default function FilterSideBar() {
     const classes = useStyles();
     const [checkedNacionalidad, setCheckedNacionalidad] = useState([]);
     const [openSede, setOpenSede] = React.useState(false);
@@ -72,7 +70,7 @@ export default function ClippedDrawer() {
     };
 
     const getNacionalidad = async () => {
-        return await fetch('http://localhost:8080/usuarios/nacionalidad/{email}'.replace('{email}', localStorage.email))
+        return fetch('http://localhost:8080/usuarios/nacionalidad/{email}'.replace('{email}', localStorage.email))
             .then(response => response.json())
             .then(data => {
                setNacionalidad(data)
@@ -83,7 +81,7 @@ export default function ClippedDrawer() {
     }
 
     const getSede = async () => {
-        return await fetch('http://localhost:8080/sedes/all')
+        return fetch('http://localhost:8080/sedes/all')
             .then(response => response.json())
             .then(data => {
                 setSede(data)
