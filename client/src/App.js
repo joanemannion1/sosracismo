@@ -12,6 +12,7 @@ import LogIn from './components/pages/LogIn';
 import CrearTrabajador from './components/pages/CrearTrabajador';
 import CambiarContrasena from './components/pages/CambiarContrasena';
 import FilterSideBar from './components/FilterSideBar'
+import AñadirCaso from './components/pages/AñadirCaso'
 import history from './history';
 
 
@@ -23,7 +24,8 @@ function App() {
         <Switch>
           <Route path='/LogIn' exact component={LogIn}/>
           <Route exact path="/" render={() => ((!localStorage.getItem('token')) ? <Redirect to="/LogIn"/> : (<AñadirUsuario />))}/>
-          <Route exact path="/Añadir usuario" render={() => ((!localStorage.getItem('token')) ? <Redirect to="/LogIn"/> : (<AñadirUsuario />))}/>
+          <Route exact path="/AñadirUsuario" render={() => ((!localStorage.getItem('token')) ? <Redirect to="/LogIn"/> : (<AñadirUsuario />))}/>
+          <Route exact path="/AñadirCaso" render={() => ((!localStorage.getItem('token')) ? <Redirect to="/LogIn"/> : (<AñadirCaso />))}/>
           <Route exact path="/VerUsuario" render={() => ((!localStorage.getItem('token')) ? <Redirect to="/LogIn"/> : (<VerUsuario />))}/>
           <Route exact path="/Citas" render={() => ((!localStorage.getItem('token')) ? <Redirect to="/LogIn"/> : (<Citas />))}/>
           <Route exact path="/AñadirIntervencion" render={() => ((!localStorage.getItem('token')) ? <Redirect to="/LogIn"/> : (<AñadirIntervencion />))}/>

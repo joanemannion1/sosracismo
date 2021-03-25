@@ -24,11 +24,16 @@ db.databaseConf = database;
 db.trabajadores = require("./trabajador")(database, Sequelize);
 db.sedes = require("./sede")(database, Sequelize);
 db.usuarios = require("./usuario")(database, Sequelize);
+db.citas = require("./cita")(database, Sequelize);
+db.usuario_cita_trabajador = require("./cita_usuario_trabajador")(database, Sequelize);
 
 db.trabajadores.belongsTo(db.sedes, {foreignKey: 'sedeId', as: 'id_sede'})
 db.usuarios.belongsTo(db.sedes, {foreignKey: 'sedeId', as: 'id_sede'})
 db.usuarios.belongsTo(db.trabajadores, {foreignKey: 'trabajadorId', as: 'id_trabajador'})
 
+db.usuario_cita_trabajador.belongsTo(db.citas, {foreignKey: 'id', as: 'citaId'})
+db.usuario_cita_trabajador.belongsTo(db.trabajadores, {foreignKey: 'trabajadorId'})
+db.usuario_cita_trabajador.belongsTo(db.usuarios, {foreignKey: 'n_documentacion', as: 'usuarioID'})
 db.ROLES = ["trabajador", "admin"];
 
 module.exports = db;

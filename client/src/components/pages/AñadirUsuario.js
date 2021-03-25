@@ -44,7 +44,7 @@ export default function AñadirUsuario() {
 		});
 
 		// limpiar campos
-		//e.target.reset();
+		e.target.reset();
 	}
 
 	const handleClose = (event, reason) => {

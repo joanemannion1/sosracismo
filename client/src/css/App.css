@@ -65,3 +65,5 @@ padding:25px;
 }
 
 .custom-dialog {width:48% !important; top:20%;}
+
+.hidden { display:none; }
