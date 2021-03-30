@@ -19,10 +19,13 @@ const useStyles = makeStyles((theme) => ({
 	},
 }));
 
-export default function AñadirUsuario() {
-	const { register, errors, handleSubmit } = useForm();
+export default function AñadirUsuario({usuario}) {
+	const isAddMode = !usuario;
+
+	const { register, errors, handleSubmit, setValue, getValues } = useForm();
 	const [open, setOpen] = useState()
 	const [sedes, setSedes] = useState([]);
+	const [user, setUser] = useState({});
 
 	useEffect(() => {
 		axios.get('http://localhost:8080/sedes/all').then(res => {
@@ -31,20 +34,46 @@ export default function AñadirUsuario() {
 			.catch(err => {
 				console.log(err);
 			})
-	});
+	},[]);
 
 	const onSubmit = (data, e) => {
 		data = {
 			...data,
 			trabajadorId: localStorage.email
 		}
+		return isAddMode
+            ? createUser(data)
+            : updateUser(usuario, data);
+
+		// limpiar campos
+		e.target.reset();
+	}
+
+	const createUser = (data) => {
 		axios.post('http://localhost:8080/usuario/create', { data }).then(res => {
 			console.log(res);
 			setOpen(true);
 		});
+	}
 
-		// limpiar campos
-		e.target.reset();
+	const updateUser = (usuario, data) => {
+		axios.post('http://localhost:8080/usuario/update/{id}'.replace('{id}', usuario), { data }).then(res => {
+			console.log(res);
+			setOpen(true);
+		});
+	}
+
+	const getUser = () => {
+		if(!isAddMode) {
+			axios.get('http://localhost:8080/usuario/getByDocumentacion/{n_doc}'.replace('{n_doc}', usuario))
+            .then(response => {
+                setUser(response.data[0])
+				const userVar = response.data[0]
+				const fields = ['nombre', 'apellido1', 'apellido2', 'tipo_documentacion', 'n_documentacion','genero', 'sedeId', 'trabajadorId', 'email', 'telefono', 'direccion', 'cp', 'localidad', 'provincia', 'pais_origen', 'nacionalidad']
+				fields.forEach(field => setValue(field, userVar[field]));
+                
+            });
+		}
 	}
 
 	const handleClose = (event, reason) => {
@@ -55,11 +84,13 @@ export default function AñadirUsuario() {
 		setOpen(false);
 	};
 
+	useEffect(() => { getUser() }, []);
+
 	return (
 		<>
 			<div className="container padding25">
 				<form onSubmit={handleSubmit(onSubmit)}>
-					<h3>Añadir Usuario</h3>
+					<h3>{ isAddMode ? 'Añadir Usuario' : 'Actualizar usuario' }</h3>
 					<div className="card mb-3">
 						<div className="card-header text-white bg-secondary">Información personal</div>
 						<div className="card-body">
@@ -708,7 +739,7 @@ export default function AñadirUsuario() {
 						</div>
 					</div>
 
-					<button type="submit" name="submit" className="btn btn-primary">Añadir Usuario</button>
+					<button type="submit" name="submit" className="btn btn-primary">{ isAddMode ? 'Añadir Usuario' : 'Actualizar usuario' }</button>
 
 					<Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
 						<Alert onClose={handleClose} severity="success">

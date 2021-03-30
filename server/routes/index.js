@@ -2,6 +2,7 @@ const trabajador = require("../controllers/trabajador");
 const sede = require("../controllers/sede");
 const usuario = require("../controllers/usuario");
 const cita = require("../controllers/cita");
+const caso = require("../controllers/caso");
 const express = require("express");
 const router = express.Router();
 
@@ -30,9 +31,11 @@ router.post("/usuario/create" ,usuario.create);
 // // Retrieve all Usuarios of a Trabajador
 router.get("/usuarios/all/:email", usuario.getAllUsuarios);
 // // Retrieve Usuario by n_documentacion
-router.put("/usuario/getByEmail", usuario.getUsuarioWithDocumentacion);
+router.get("/usuario/getByDocumentacion/:ndoc", usuario.getUsuarioWithDocumentacion);
 // // Retrieve distinct nationalities
 router.get("/usuarios/nacionalidad/:email", usuario.getAllNationalities);
+//
+router.get("/usuarios/genero", usuario.getCountUserByNationalities);
 
 
 //Create new Cita
@@ -42,5 +45,17 @@ router.get("/citas/all", cita.getAllCitas);
 // // Delete cita by id
 router.delete("/cita/delete/:id", cita.deleteCita);
 
+//Create new Caso Discriminacion
+router.post("/caso/create/discriminacion" , caso.createDiscriminacion);
+//Create new Caso TrabajadoraHogar
+router.post("/caso/create/trabajadoraHogar" , caso.createTrabajadoraHogar);
+// // Retrieve all Casos of a Trabajador
+router.get("/casos/all/:email", caso.getAllCasos);
+// // Retrieve Casos by Id
+router.get("/caso/:id", caso.getCasoById);
+// // Retrieve Caso Especifico by Id
+router.get("/casoEspecifico/:id", caso.getCasoEspecificoById);
+//Create new Caso Extranjeria
+//router.post("/caso/create/extranjeria" , caso.createExtranjeria);
 
 module.exports = router;

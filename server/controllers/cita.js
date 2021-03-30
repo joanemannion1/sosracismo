@@ -7,7 +7,6 @@ const { usuario_cita_trabajador } = require("../models");
 
 // Create and Save a new Cita
 exports.create = (req, res) => {
-    console.log(req.body.formData)
     // Validate request
     if (!req.body.formData.fechaInicio) {
         res.status(400).send({
