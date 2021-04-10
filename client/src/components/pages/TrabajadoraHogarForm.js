@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
 import history from '../../history';
 
-export default function TrabajadoraHogarForm({ usuario }) {
+export default function TrabajadoraHogarForm({ usuario , caso }) {
+    const isAddMode = !caso;
 
-    const { register, errors, handleSubmit } = useForm();
+    const { register, errors, handleSubmit, setValue, getValues } = useForm();
 
     const onSubmit = (data, e) => {
         data = {
@@ -13,13 +14,33 @@ export default function TrabajadoraHogarForm({ usuario }) {
             trabajadorId: localStorage.email,
             ...data
         }
-        console.log(data)
         axios.post('http://localhost:8080/caso/create/trabajadoraHogar', { data }).then(res => {
             console.log(res);
         });
     }
 
+    const getCasoEspecifico = () => {
+        if (!isAddMode) {
+            axios.get('http://localhost:8080/casoEspecifico/trabajadora/{id}'.replace('{id}', caso))
+                .then(response => {
+                    const casoVar = response.data[0]
+                    console.log(casoVar)
+                    const fields = ['motivo', 'n_casas', 'forma_empleo', 'contratador', 'horario_base', 'horas_totales', 'libra_festivos', 'no_libra_pero_cobra', 'salario_festivos', 'salario', 'pagas', 'forma_pago', 'vacaciones', 'tipo_trabajo', 'mayores', 'genero_mayores', 'enfermos', 'genero_enfermos', 'permiso_salida', 'descanso_semanal']
+                    fields.forEach(field => setValue(field, casoVar[field]));
+                    setValue('fecha_inicio', casoVar['fecha_inicio'].substring(0,10))
+                    setValue('fecha_final', casoVar['fecha_final'].substring(0,10))
+                    setValue('fecha_despido', casoVar['fecha_despido'].substring(0,10))
+                    setValue('viven_solos', casoVar['viven_solos'] === 0? 'false' : 'true')
+                    setValue('contrato', casoVar['contrato'] === 0? 'false' : 'true')
+                    setValue('nomina', casoVar['nomina'] === 0? 'false' : 'true')
+                    setValue('seguridad_social', casoVar['seguridad_social'] === 0? 'false' : 'true')
+                    setValue('solo_fines_semana', casoVar['solo_fines_semana'] === 0? 'false' : 'true')
+                    setValue('regularizada', casoVar['regularizada'] === 0? 'false' : 'true')
+                });
+        }
+    }
 
+    useEffect(() => { getCasoEspecifico() }, []);
 
     return (
         <>
@@ -235,7 +256,7 @@ export default function TrabajadoraHogarForm({ usuario }) {
                             </div>
                         </div>
                     </div>
-                <button type="submit" name="submit" onClick={handleSubmit(onSubmit)} className="btn btn-primary" >Añadir Caso</button>
+                <button type="submit" name="submit" onClick={handleSubmit(onSubmit)} className="btn btn-primary" >{ isAddMode ? 'Añadir Caso' : 'Actualizar caso' }</button>
             </form>
         </>
     )

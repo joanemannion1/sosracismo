@@ -49,13 +49,23 @@ router.delete("/cita/delete/:id", cita.deleteCita);
 router.post("/caso/create/discriminacion" , caso.createDiscriminacion);
 //Create new Caso TrabajadoraHogar
 router.post("/caso/create/trabajadoraHogar" , caso.createTrabajadoraHogar);
+//Create new Caso Extranjeria
+router.post("/caso/create/extranjeria" , caso.createExtranjeria);
 // // Retrieve all Casos of a Trabajador
 router.get("/casos/all/:email", caso.getAllCasos);
 // // Retrieve Casos by Id
 router.get("/caso/:id", caso.getCasoById);
 // // Retrieve Caso Especifico by Id
-router.get("/casoEspecifico/:id", caso.getCasoEspecificoById);
-//Create new Caso Extranjeria
-//router.post("/caso/create/extranjeria" , caso.createExtranjeria);
+router.get("/casoEspecifico/discriminacion/:id", caso.getCasoEspecificoDiscriminacionId);
+// // Retrieve Caso Especifico by Id
+router.get("/casoEspecifico/trabajadora/:id", caso.getCasoEspecificoTrabajadoraId);
+// // Retrieve Caso Especifico by Id
+router.get("/casoEspecifico/extranjeria/:id", caso.getCasoEspecificoExtranjeriaId);
+// // Retrieve Caso Especifico by Id
+router.get("/necesidad/:id", caso.getNecesidadExtranjeriaId);
+// // Retrieve Caso Especifico by Id
+router.get("/casoType/:id", caso.getCasoType);
+// // Retrieve Caso Especifico by Id
+router.get("/caso/finalizar/:id", caso.finalizarCaso);
 
 module.exports = router;

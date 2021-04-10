@@ -31,6 +31,8 @@ db.discriminaciones = require("./discriminacion")(database, Sequelize);
 db.trabajadoras_hogar = require("./trabajadorahogar")(database, Sequelize);
 db.internas = require("./interna")(database, Sequelize);
 db.externas = require("./externa")(database, Sequelize);
+db.extranjerias = require("./extranjeria")(database, Sequelize);
+db.necesidadextranjeria = require("./necesidadextranjeria")(database, Sequelize);
 
 db.trabajadores.belongsTo(db.sedes, {foreignKey: 'sedeId', as: 'id_sede'})
 db.usuarios.belongsTo(db.sedes, {foreignKey: 'sedeId', as: 'id_sede'})
@@ -45,8 +47,10 @@ db.casos.belongsTo(db.trabajadores, {foreignKey: 'trabajadorId', as: 'id_trabaja
 db.casos.belongsTo(db.usuarios, {foreignKey: 'n_documentacion', as: 'usuarioId'})
 db.discriminaciones.belongsTo(db.casos, {foreignKey: 'id', as: 'casoId'})
 db.trabajadoras_hogar.belongsTo(db.casos, {foreignKey: 'id', as: 'casoId'})
-db.internas.belongsTo(db.discriminaciones,{foreignKey:'id', as:'id'})
-db.externas.belongsTo(db.discriminaciones,{foreignKey:'id', as:'id'})
-
+db.extranjerias.belongsTo(db.casos, {foreignKey: 'id', as: 'casoId'})
+db.externas.belongsTo(db.trabajadoras_hogar,{foreignKey:'id', as:'internaId'})
+db.internas.belongsTo(db.trabajadoras_hogar,{foreignKey:'id', as:'externaId'})
+db.necesidadextranjeria.belongsTo(db.extranjerias,{foreignKey:'id', as:'necesidadId'})
+ 
 module.exports = db;
 
