@@ -1,77 +1,41 @@
+
 import React, { useState } from 'react';
+import '../css/Navbar.css'
+import { Nav, Navbar, NavDropdown } from 'react-bootstrap'
 import { Link } from 'react-router-dom';
-import '../css/Navbar.css';
-import Dropdown from './Dropdown';
-import history from '../history';
+import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 
-function Navbar() {
-    const [click, setClick] = useState(false);
-    const [dropdown, setDropdown] = useState(false);
-
-    const handleClick = () => setClick(!click);
-
-    const closeMobileMenu = () => setClick(false);
-    
-    const onMouseEnter = () => {
-        if (window.innerWidth < 960) {
-          setDropdown(false);
-        } else {
-          setDropdown(true);
-        }
-      };
-    
-    const onMouseLeave = () => {
-        if (window.innerWidth < 960) {
-          setDropdown(false);
-        } else {
-          setDropdown(true);
-        }
-    };
-    
-    const logout = () => {
-        localStorage.removeItem("token");
-        history.push('/LogIn');
-    }
-
+function Menu() {
+    const navDropdownTitle = (<><AccountCircleIcon /> Mi perfil</>);
     return (
         <>
-            <nav className='navbar'>
-                <button type="button" onClick={logout}>Log out</button>
-                <Link to="/" className='navbar-logo' onClick={closeMobileMenu}>
-                    Sos Racismo
-                    <i className='fas fa-hand-paper' />
-                </Link>
-                <div className='menu-icon' onClick={handleClick}>
-                    <i className={click ? 'fas fa-times' : 'fas fa-bars'} />
-                </div>
-                <ul className={click ? 'nav-menu active' : 'nav-menu'}>
-                    <li className='nav-item'>
-                        <Link to='/' className='nav-links' onClick={closeMobileMenu}>
-                            Inicio
-                        </Link>
-                    </li>
-                    <li className='nav-item'
-                        onMouseEnter={onMouseEnter}
-                        onMouseLeave={onMouseLeave}
-                    >
-                        <Link to='/usuario' className='nav-links' onClick={closeMobileMenu}>
-                            Usuarios <i className='fas fa-caret-down' />
-                        </Link>
-                        {dropdown && <Dropdown />}
-                    </li>
-
-                    <li className='nav-item'>
-                        <Link to='/Citas' className='nav-links' onClick={closeMobileMenu}>
-                            Citas
-                        </Link>
-                    </li>
-
-                </ul>
-            </nav>
+            <Navbar collapseOnSelect expand="xl" bg="dark" variant="dark">
+                <Navbar.Brand> <Link to='/' className='navbar-logo' style={{ paddingLeft: 60 }}>
+                    Sos racismo
+                        </Link></Navbar.Brand>
+                <Navbar.Toggle aria-controls="responsive-navbar-nav" />
+                <Navbar.Collapse id="responsive-navbar-nav">
+                    <Nav className="mr-auto">
+                        <NavDropdown title="Usuarios" id="collasible-nav-dropdown">
+                            <NavDropdown.Item><Link to='/SideBar' className='nav-links'>Ver Usuarios</Link></NavDropdown.Item>
+                            <NavDropdown.Item><Link to='/AñadirUsuario' className='nav-links'>Añadir Usuario</Link></NavDropdown.Item>
+                        </NavDropdown>
+                        <Nav.Link>  <Link to='/Citas' className='navbar-logo'>
+                            Calendario
+                        </Link></Nav.Link>
+                    </Nav>
+                    <Nav>
+                        <NavDropdown title={navDropdownTitle} id="collasible-nav-dropdown" style={{ paddingRight: 60 }}>
+                            <NavDropdown.Item><Link to='/CambiarContraseña' className='nav-links'>Cambiar Contraseña</Link></NavDropdown.Item>
+                            <NavDropdown.Item><Link to='/CrearTrabajador' className='nav-links'>Añadir Trabajador</Link></NavDropdown.Item>
+                            <NavDropdown.Divider />
+                            <NavDropdown.Item><Link to='/' className='nav-links'>Log out</Link></NavDropdown.Item>
+                        </NavDropdown>
+                    </Nav>
+                </Navbar.Collapse>
+            </Navbar>
         </>
     );
 }
 
-
-
-export default Navbar;
+export default Menu;

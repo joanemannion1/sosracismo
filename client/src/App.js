@@ -21,7 +21,6 @@ import history from './history';
 function App() {
     return (
       <Router history={history}>
-        {/* ! <Navbar /> */}
         <Switch>
           <Route path='/LogIn' exact component={LogIn}/>
           <Route exact path="/" render={() => ((!localStorage.getItem('token')) ? <Redirect to="/LogIn"/> : (<AñadirUsuario />))}/>
@@ -31,7 +30,7 @@ function App() {
           <Route exact path="/VerCaso/:caso" render={({match}) => ((!localStorage.getItem('token')) ? <Redirect to="/LogIn"/> : (<VerCaso casoId={match.params.caso} />))}/>
           <Route exact path="/VerUsuario" render={() => ((!localStorage.getItem('token')) ? <Redirect to="/LogIn"/> : (<VerUsuario />))}/>
           <Route exact path="/Citas" render={() => ((!localStorage.getItem('token')) ? <Redirect to="/LogIn"/> : (<Citas />))}/>
-          <Route exact path="/AñadirIntervencion" render={() => ((!localStorage.getItem('token')) ? <Redirect to="/LogIn"/> : (<AñadirIntervencion />))}/>
+          <Route exact path="/AñadirIntervencion/:caso" render={({match}) => ((!localStorage.getItem('token')) ? <Redirect to="/LogIn"/> : (<AñadirIntervencion caso={match.params.caso}/>))}/>
           <Route exact path="/CrearTrabajador" render={() => ((!localStorage.getItem('token')) ? <Redirect to="/LogIn"/> : (<CrearTrabajador />))}/>
           <Route exact path="/CambiarContraseña" render={() => ((!localStorage.getItem('token')) ? <Redirect to="/LogIn"/> : (<CambiarContrasena />))}/>
           <Route exact path="/SideBar" render={() => ((!localStorage.getItem('token')) ? <Redirect to="/LogIn"/> : (<FilterSideBar />))}/>

@@ -10,6 +10,7 @@ import TrabajadoraHogarForm from './TrabajadoraHogarForm'
 import ExtranjeriaForm from './ExtranjeriaForm';
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
+import Menu from '../Navbar'
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -93,6 +94,7 @@ export default function VerCaso({ casoId }) {
     useEffect(() => { getCasoType() }, []);
     return (
         <>
+        <Menu />
             <div className={classes.root} style={{ paddingTop: "10px" }}>
                 <Container maxWidth="md" style={{ textAlignVertical: "center", textAlign: "center", }}>
                     <h4>Usuario: {caso.n_documentacion}</h4>
@@ -104,7 +106,7 @@ export default function VerCaso({ casoId }) {
                             <p>Finalizado: {caso.finalizado ? 'Si' : 'No'}</p>
                         </Grid>
                         <Grid item xs={4}>
-                            <p>Última actualización: {caso.updatedAt}</p>
+                            <p>Última actualización: {caso.updatedAt.substring(0,10)}</p>
                         </Grid>
                     </Grid>
                     <Grid container spacing={3}>

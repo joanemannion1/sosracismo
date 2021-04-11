@@ -3,6 +3,7 @@ const sede = require("../controllers/sede");
 const usuario = require("../controllers/usuario");
 const cita = require("../controllers/cita");
 const caso = require("../controllers/caso");
+const intervencion = require("../controllers/intervencion");
 const express = require("express");
 const router = express.Router();
 
@@ -67,5 +68,8 @@ router.get("/necesidad/:id", caso.getNecesidadExtranjeriaId);
 router.get("/casoType/:id", caso.getCasoType);
 // // Retrieve Caso Especifico by Id
 router.get("/caso/finalizar/:id", caso.finalizarCaso);
+
+//Create new Intervencion
+router.post("/intervencion/create" , intervencion.create);
 
 module.exports = router;

@@ -3,7 +3,7 @@ import React,  { useState, useEffect } from 'react';
 import { CirclePicker } from 'react-color';
 import { useForm } from 'react-hook-form';
 import * as emailjs from 'emailjs-com'
-
+import Menu from '../Navbar'
 
 export default function CrearTrabajador() {
     const {register, errors, handleSubmit} = useForm();
@@ -59,6 +59,7 @@ export default function CrearTrabajador() {
 
     return (
         <>
+        <Menu />
             <form onSubmit={handleSubmit(onSubmit)}>
                 <div className="jumbotron vertical-center bg-white">
                     <div className="w-50 container padding25">

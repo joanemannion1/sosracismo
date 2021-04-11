@@ -1,6 +1,7 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
+import Menu from '../Navbar'
 
 export default function CambiarContrasena() {
     const {register, errors, handleSubmit} = useForm();
@@ -20,6 +21,7 @@ export default function CambiarContrasena() {
 
     return (
         <>
+        <Menu />
             <div className="jumbotron vertical-center bg-white">
                 <div className="w-25 container padding25">
                     <form className="form-signin" onSubmit={handleSubmit(onSubmit)}>

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
 import axios from 'axios'
 import DiscriminacionForm from './DiscriminacionForm'
 import TrabajoraHogarForm from './TrabajadoraHogarForm'
 import ExtranjeriaForm from './ExtranjeriaForm'
+import Menu from '../Navbar'
 
 export default function AñadirCaso({user}) {
     const [showTrabajador, setShowTrabajador] = useState(false);
@@ -25,6 +25,7 @@ export default function AñadirCaso({user}) {
     useEffect(() => { getData() }, []);
     return (
         <>
+        <Menu />
             <div className="container padding25">
                 <h3>Añadir Caso : {usuario.nombre} {usuario.apellido1}</h3>
                 {/* TRABAJADORA DEL HOGAR */}

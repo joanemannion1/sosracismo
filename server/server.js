@@ -1,5 +1,4 @@
 const express = require("express");
-const bodyParser = require("body-parser");
 const cors = require("cors");
 const server = express();
 const db = require("./models");
@@ -21,6 +20,8 @@ server.use((req, res, next) => {
   res.header('Allow', 'GET, POST, OPTIONS, PUT, DELETE');
   next();
 });
+
+
 
 
 server.get("/", (req, res) => {

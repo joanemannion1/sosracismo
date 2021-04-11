@@ -10,11 +10,6 @@ export const MenuItems = [
         cName: 'dropdown-link'
     },
     {
-        title: 'Añadir intervención',
-        path: '/AñadirIntervencion',
-        cName: 'dropdown-link'
-    },
-    {
         title: 'Log in',
         path: '/LogIn',
         cName: 'dropdown-link'

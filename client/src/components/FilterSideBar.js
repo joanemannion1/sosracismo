@@ -10,7 +10,7 @@ import HomeWorkIcon from '@material-ui/icons/HomeWork';
 import Collapse from '@material-ui/core/Collapse';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
-
+import Navbar from './Navbar'
 const drawerWidth = 240;
 
 const useStyles = makeStyles((theme) => ({
@@ -106,11 +106,12 @@ export default function FilterSideBar() {
         <div className={classes.root}>
             <CssBaseline />
             <AppBar position="fixed" className={classes.appBar}>
-                <Toolbar>
+                {/* <Toolbar>
                     <Typography variant="h6" noWrap>
                         Ver Usuarios
           </Typography>
-                </Toolbar>
+                </Toolbar> */}
+                <Navbar />
             </AppBar>
             <Drawer
                 className={classes.drawer}

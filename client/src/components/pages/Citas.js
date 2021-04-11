@@ -15,8 +15,7 @@ import Checkbox from '@material-ui/core/Checkbox';
 import ListItemText from '@material-ui/core/ListItemText';
 import GroupIcon from '@material-ui/icons/Group';
 import Collapse from '@material-ui/core/Collapse';
-import ExpandLess from '@material-ui/icons/ExpandLess';
-import ExpandMore from '@material-ui/icons/ExpandMore';
+import Menu from '../Navbar'
 
 const drawerWidth = 300;
 
@@ -68,7 +67,7 @@ export default function Citas() {
     }
 
     const getCitas = async () => {
-        return await fetch('http://localhost:8080/citas/all/')
+        return fetch('http://localhost:8080/citas/all/')
             .then(response => response.json())
             .then(data => {
                 data[0].map((val => {
@@ -318,11 +317,7 @@ export default function Citas() {
             <div className={classesDrawer.root}>
                 <CssBaseline />
                 <AppBar position="fixed" className={classesDrawer.appBar}>
-                    <Toolbar>
-                        <Typography variant="h6" noWrap>
-                            Calendario
-                        </Typography>
-                    </Toolbar>
+                   <Menu />
                 </AppBar>
                 <Drawer
                     className={classesDrawer.drawer}

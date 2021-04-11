@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
 import { makeStyles } from '@material-ui/core/styles';
+import Menu from '../Navbar'
 
 function Alert(props) {
 	return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -22,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
 export default function AñadirUsuario({usuario}) {
 	const isAddMode = !usuario;
 
-	const { register, errors, handleSubmit, setValue, getValues } = useForm();
+	const { register, errors, handleSubmit, setValue } = useForm();
 	const [open, setOpen] = useState()
 	const [sedes, setSedes] = useState([]);
 	const [user, setUser] = useState({});
@@ -56,8 +57,8 @@ export default function AñadirUsuario({usuario}) {
 		});
 	}
 
-	const updateUser = (usuario, data) => {
-		axios.post('http://localhost:8080/usuario/update/{id}'.replace('{id}', usuario), { data }).then(res => {
+	const updateUser = (usr, data) => {
+		axios.post('http://localhost:8080/usuario/update/{id}'.replace('{id}', usr), { data }).then(res => {
 			console.log(res);
 			setOpen(true);
 		});
@@ -88,6 +89,7 @@ export default function AñadirUsuario({usuario}) {
 
 	return (
 		<>
+		<Menu />
 			<div className="container padding25">
 				<form onSubmit={handleSubmit(onSubmit)}>
 					<h3>{ isAddMode ? 'Añadir Usuario' : 'Actualizar usuario' }</h3>
