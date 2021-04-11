@@ -8,9 +8,27 @@ import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormControl from '@material-ui/core/FormControl';
 import FormLabel from '@material-ui/core/FormLabel';
+import Snackbar from '@material-ui/core/Snackbar';
+import MuiAlert from '@material-ui/lab/Alert';
+
+function Alert(props) {
+	return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 export default function ExtranjeriaForm({usuario, caso}) {
     const isAddMode = !caso;
+
+    // MUI ALERT
+    const [open, setOpen] = useState()
+    const [error, setError] = useState()
+
+    const handleClose = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        setError(false)
+        setOpen(false);
+    };
 
     const [showExtranjeria, setShowExtranjeria] = useState(false);
     const [showAsistencia, setShowAsistencia] = useState(false);
@@ -55,12 +73,30 @@ export default function ExtranjeriaForm({usuario, caso}) {
             proyectos: selectedProyecto
 
         }
+        return isAddMode
+        ? createCaso(data, e)
+        : updateCaso(caso, data);
+    }
+    const createCaso = (data, e) => {
         axios.post('http://localhost:8080/caso/create/extranjeria', { data }).then(res => {
             console.log(res);
-        });
+            setOpen(true);
+            e.target.reset();
+        }).catch((error) => {
+            setError(true)
+           })
 
-        // limpiar campos
-       // e.target.reset();
+    }
+
+    
+    const updateCaso = (caso, data) => {
+        axios.post('http://localhost:8080/caso/update/extranjeria/{id}'.replace('{id}', caso), { data }).then(res => {
+            console.log(res);
+            setOpen(true);
+        }).catch((error) => {
+            setError(true)
+           })
+
     }
 
     const getCasoEspecifico = () => {
@@ -244,6 +280,17 @@ export default function ExtranjeriaForm({usuario, caso}) {
 
                 <button type="submit" name="submit" onClick={handleSubmit(onSubmit)} className="btn btn-primary" >{ isAddMode ? 'Añadir Caso' : 'Actualizar caso' }</button>
             </form>
+            <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+                <Alert onClose={handleClose} severity="success">
+                    El caso ha sido {isAddMode ? 'añadido' : 'actualizado'} correctamente!
+        				</Alert>
+            </Snackbar>
+
+            <Snackbar open={error} autoHideDuration={6000} onClose={handleClose}>
+                <Alert onClose={handleClose} severity="error">
+                    Ha habido algun error {isAddMode ? 'añadiendo' : 'actualizando'} el caso :(
+        				</Alert>
+            </Snackbar>
         </>
     )
 }

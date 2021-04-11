@@ -29,6 +29,8 @@ router.get("/sedes/all", sede.getAllSedes);
 
 // Create New User
 router.post("/usuario/create" ,usuario.create);
+// Create New User
+router.post("/usuario/update/:id" ,usuario.update);
 // // Retrieve all Usuarios of a Trabajador
 router.get("/usuarios/all/:email", usuario.getAllUsuarios);
 // // Retrieve Usuario by n_documentacion
@@ -48,12 +50,20 @@ router.delete("/cita/delete/:id", cita.deleteCita);
 
 //Create new Caso Discriminacion
 router.post("/caso/create/discriminacion" , caso.createDiscriminacion);
+//Update Caso Discriminacion
+router.post("/caso/update/discriminacion/:id" , caso.updateDiscriminacion);
 //Create new Caso TrabajadoraHogar
 router.post("/caso/create/trabajadoraHogar" , caso.createTrabajadoraHogar);
+//Update Caso Discriminacion
+router.post("/caso/update/trabajadoraHogar/:id" , caso.updateTrabajadoraHogar);
 //Create new Caso Extranjeria
 router.post("/caso/create/extranjeria" , caso.createExtranjeria);
+//Update Caso Discriminacion
+router.post("/caso/update/extranjeria/:id" , caso.updateExtranjeria);
 // // Retrieve all Casos of a Trabajador
 router.get("/casos/all/:email", caso.getAllCasos);
+// // Retrieve all Casos of a Trabajador
+router.get("/casos/allActive/:email", caso.getAllCasosNoFinalizados);
 // // Retrieve Casos by Id
 router.get("/caso/:id", caso.getCasoById);
 // // Retrieve Caso Especifico by Id

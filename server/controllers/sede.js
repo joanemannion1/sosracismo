@@ -6,7 +6,7 @@ const { param } = require("../routes");
 // Create and Save a new Sede
 exports.create = (req, res) => {
     // Validate request
-    if (!req.body.title) {
+    if (!req.body.data.nombre) {
         res.status(400).send({
         message: "Contenido no puede estar vacio!"
         });
@@ -15,8 +15,8 @@ exports.create = (req, res) => {
     
     // Create a Tutorial
     const sede = {
-        nombre: req.body.nombre,
-        localidad: req.body.localidad
+        nombre: req.body.data.nombre,
+        localidad: req.body.data.localidad
     };
     
     // Save Tutorial in the database

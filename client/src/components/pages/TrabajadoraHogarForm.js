@@ -1,10 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
-import history from '../../history';
+import Snackbar from '@material-ui/core/Snackbar';
+import MuiAlert from '@material-ui/lab/Alert';
+
+function Alert(props) {
+	return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 export default function TrabajadoraHogarForm({ usuario , caso }) {
     const isAddMode = !caso;
+
+     // MUI ALERT
+     const [open, setOpen] = useState()
+     const [error, setError] = useState()
+
+     const handleClose = (event, reason) => {
+         if (reason === 'clickaway') {
+             return;
+         }
+         
+         setError(false)
+         setOpen(false);
+     };
 
     const { register, errors, handleSubmit, setValue, getValues } = useForm();
 
@@ -14,10 +32,33 @@ export default function TrabajadoraHogarForm({ usuario , caso }) {
             trabajadorId: localStorage.email,
             ...data
         }
+        return isAddMode
+            ? createCaso(data, e)
+            : updateCaso(caso, data);
+    }
+
+    const createCaso = (data, e) => {
         axios.post('http://localhost:8080/caso/create/trabajadoraHogar', { data }).then(res => {
             console.log(res);
-        });
+            setOpen(true);
+            e.target.reset();
+        }).catch((error) => {
+            setError(true)
+           })
+
     }
+
+    
+    const updateCaso = (caso, data) => {
+        axios.post('http://localhost:8080/caso/update/trabajadoraHogar/{id}'.replace('{id}', caso), { data }).then(res => {
+            console.log(res);
+            setOpen(true);
+        }).catch((error) => {
+            setError(true)
+           })
+
+    }
+
 
     const getCasoEspecifico = () => {
         if (!isAddMode) {
@@ -258,6 +299,18 @@ export default function TrabajadoraHogarForm({ usuario , caso }) {
                     </div>
                 <button type="submit" name="submit" onClick={handleSubmit(onSubmit)} className="btn btn-primary" >{ isAddMode ? 'Añadir Caso' : 'Actualizar caso' }</button>
             </form>
+
+            <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+                <Alert onClose={handleClose} severity="success">
+                    El caso ha sido {isAddMode ? 'añadido' : 'actualizado'} correctamente!
+        				</Alert>
+            </Snackbar>
+
+            <Snackbar open={error} autoHideDuration={6000} onClose={handleClose}>
+                <Alert onClose={handleClose} severity="error">
+                    Ha habido algun error {isAddMode ? 'añadiendo' : 'actualizando'} el caso :(
+        				</Alert>
+            </Snackbar>
         </>
     )
 }

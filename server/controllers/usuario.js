@@ -101,3 +101,48 @@ exports.getCountUserByNationalities = (req, res) => {
     res.send(results[0])
   });
 }
+
+
+
+exports.update = (req, res) => {
+  const id = req.params.id;
+
+  const usuario = {
+    tipo_documentacion: req.body.data.tipo_documentacion,
+    n_documentacion: req.body.data.n_documentacion,
+    nombre: req.body.data.nombre,
+    apellido1: req.body.data.apellido1,
+    apellido2: req.body.data.apellido2,
+    genero: req.body.data.genero,
+    email: req.body.data.email,
+    telefono: req.body.data.telefono ? req.body.data.telefono : null,
+    direccion: req.body.data.direccion,
+    localidad: req.body.data.localidad,
+    cp: req.body.data.cp ? req.body.data.cp : null,
+    provincia: req.body.data.provincia,
+    nacionalidad: req.body.data.nacionalidad,
+    pais_origen: req.body.data.pais_origen,
+    sedeId: req.body.data.sedeId,
+    trabajadorId: req.body.data.trabajadorId,
+  };
+
+  Usuario.update(usuario, {
+    where: { n_documentacion: id }
+  })
+    .then(num => {
+      if (num == 1) {
+        res.send({
+          message: "User was updated successfully."
+        });
+      } else {
+        res.send({
+          message: `Cannot update User with id=${id}. Maybe User was not found or req.body is empty!`
+        });
+      }
+    })
+    .catch(err => {
+      res.status(500).send({
+        message: "Error updating User with id=" + id
+      });
+    });
+};

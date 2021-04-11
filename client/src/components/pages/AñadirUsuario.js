@@ -46,8 +46,6 @@ export default function AñadirUsuario({usuario}) {
             ? createUser(data)
             : updateUser(usuario, data);
 
-		// limpiar campos
-		e.target.reset();
 	}
 
 	const createUser = (data) => {
@@ -745,7 +743,7 @@ export default function AñadirUsuario({usuario}) {
 
 					<Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
 						<Alert onClose={handleClose} severity="success">
-							El usuario ha sido añadido correctamente!
+							El usuario ha sido { isAddMode ? 'añadido' : 'actualizado' } correctamente!
         				</Alert>
 					</Snackbar>
 					<div className="modal" tabIndex="-1" role="dialog" id="confirmationModal">

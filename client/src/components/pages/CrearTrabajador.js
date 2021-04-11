@@ -4,12 +4,32 @@ import { CirclePicker } from 'react-color';
 import { useForm } from 'react-hook-form';
 import * as emailjs from 'emailjs-com'
 import Menu from '../Navbar'
+import Snackbar from '@material-ui/core/Snackbar';
+import MuiAlert from '@material-ui/lab/Alert';
+import { Z_STREAM_ERROR } from 'zlib';
+
+function Alert(props) {
+	return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 export default function CrearTrabajador() {
     const {register, errors, handleSubmit} = useForm();
 
     const [sedes, setSedes] = useState([]);
     const [selectedColor, setColor] = useState([111111]);
+
+    // MUI ALERT
+    const [open, setOpen] = useState()
+    const [error, setError] = useState()
+
+    const handleClose = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+
+        setError(false)
+        setOpen(false);
+    };
 
     useEffect(() => {    
         axios.get('http://localhost:8080/sedes/all').then(res => {
@@ -49,8 +69,10 @@ export default function CrearTrabajador() {
              }, function(error) {
                 console.log('FAILED...', error);
              });
-            console.log(res);
-        })
+            setOpen(true)
+        }).catch((error) => {
+           setError(true)
+          })
 
 
         // limpiar campos
@@ -127,6 +149,17 @@ export default function CrearTrabajador() {
                 </div>
 
             </form>
+            <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+                <Alert onClose={handleClose} severity="success">
+                    El trabajador ha sido añadido correctamente!
+        				</Alert>
+            </Snackbar>
+
+            <Snackbar open={error} autoHideDuration={6000} onClose={handleClose}>
+                <Alert onClose={handleClose} severity="error">
+                    Ha habido algun error creando el trabajador :(
+        				</Alert>
+            </Snackbar>
         </>
     )
 }

@@ -1,7 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
+import Snackbar from '@material-ui/core/Snackbar';
+import MuiAlert from '@material-ui/lab/Alert';
 import history from '../../history';
+
+function Alert(props) {
+	return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 export default function DiscriminacionForm({ usuario, caso }) {
     const isAddMode = !caso;
@@ -11,19 +17,57 @@ export default function DiscriminacionForm({ usuario, caso }) {
     const [selectedTipo, setSelectedTipo] = useState("Conflicto");
     const [selectedEstrategia, setSelectedEstrategia] = useState("Asumir");
 
+    // MUI ALERT
+    const [open, setOpen] = useState()
+    const [error, setError] = useState()
+
+    const handleClose = (event, reason) => {
+		if (reason === 'clickaway') {
+			return;
+		}
+
+        setError(false)
+		setOpen(false);
+	};
+
+
     const showTipo = (event) => { setSelectedTipo(event.target.value) }
     const showEstrategia = (event) => { setSelectedEstrategia(event.target.value) }
 
+
+
     const onSubmit = (data, e) => {
-        console.log(data)
         data = {
             n_documentacion: usuario,
             trabajadorId: localStorage.email,
             ...data
         }
+        return isAddMode
+            ? createCaso(data, e)
+            : updateCaso(caso, data);
+
+
+
+    }
+
+    const createCaso = (data, e) => {
         axios.post('http://localhost:8080/caso/create/discriminacion', { data }).then(res => {
             console.log(res);
-        });
+            setOpen(true);
+            e.target.reset();
+        }).catch((error) => {
+            setError(true)
+           })
+
+    }
+
+    const updateCaso = (caso, data) => {
+        axios.post('http://localhost:8080/caso/update/discriminacion/{id}'.replace('{id}', caso), { data }).then(res => {
+            console.log(res);
+            setOpen(true);
+        }).catch((error) => {
+            setError(true)
+           })
 
     }
 
@@ -34,13 +78,13 @@ export default function DiscriminacionForm({ usuario, caso }) {
                     const casoVar = response.data[0]
                     const fields = ['Situacion_documental', 'situacion_residencial', 'estudios', 'rasgos_fenotipicos', 'tipo', 'conflicto', 'denegacion_privada', 'denegacion_publica', 'racismo', 'agente_discriminador', 'relato_hechos', 'municipio', 'identificacion', 'testigos', 'otros', 'estrategia', 'asumir', 'derivar']
                     fields.forEach(field => setValue(field, casoVar[field]));
-                    setValue('fecha', casoVar['fecha'].substring(0,10))
+                    setValue('fecha', casoVar['fecha'].substring(0, 10))
                 });
         }
     }
 
     useEffect(() => { getCasoEspecifico() }, []);
-   
+
     return (
         <>
             <form onSubmit={handleSubmit(onSubmit)}>
@@ -234,8 +278,20 @@ export default function DiscriminacionForm({ usuario, caso }) {
                     <textarea className="form-control" ref={register} name="otros" rows="2"></textarea>
                 </div>
 
-                <button type="submit" name="submit" onClick={handleSubmit(onSubmit)} className="btn btn-primary" >{ isAddMode ? 'Añadir Caso' : 'Actualizar caso' }</button>
+                <button type="submit" name="submit" onClick={handleSubmit(onSubmit)} className="btn btn-primary" >{isAddMode ? 'Añadir Caso' : 'Actualizar caso'}</button>
             </form>
+
+            <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+                <Alert onClose={handleClose} severity="success">
+                    El caso ha sido {isAddMode ? 'añadido' : 'actualizado'} correctamente!
+        				</Alert>
+            </Snackbar>
+
+            <Snackbar open={error} autoHideDuration={6000} onClose={handleClose}>
+                <Alert onClose={handleClose} severity="error">
+                    Ha habido algun error {isAddMode ? 'añadiendo' : 'actualizando'} el caso :(
+        				</Alert>
+            </Snackbar>
         </>
     )
 }

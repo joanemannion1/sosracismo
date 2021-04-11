@@ -14,6 +14,8 @@ import CambiarContrasena from './components/pages/CambiarContrasena';
 import FilterSideBar from './components/FilterSideBar'
 import AñadirCaso from './components/pages/AñadirCaso'
 import VerCaso from './components/pages/VerCaso'
+import CrearSede from './components/pages/AñadirSede'
+import VerCasosNoFinalizados from './components/pages/VerCasosNoFinalizados'
 import history from './history';
 
 
@@ -34,6 +36,8 @@ function App() {
           <Route exact path="/CrearTrabajador" render={() => ((!localStorage.getItem('token')) ? <Redirect to="/LogIn"/> : (<CrearTrabajador />))}/>
           <Route exact path="/CambiarContraseña" render={() => ((!localStorage.getItem('token')) ? <Redirect to="/LogIn"/> : (<CambiarContrasena />))}/>
           <Route exact path="/SideBar" render={() => ((!localStorage.getItem('token')) ? <Redirect to="/LogIn"/> : (<FilterSideBar />))}/>
+          <Route exact path="/CasosNoFinalizados" render={() => ((!localStorage.getItem('token')) ? <Redirect to="/LogIn"/> : (<VerCasosNoFinalizados />))}/>
+          <Route exact path="/CrearSede" render={() => ((!localStorage.getItem('token')) ? <Redirect to="/LogIn"/> : (<CrearSede />))}/>
         </Switch> 
       </Router>
     );

@@ -34,6 +34,7 @@ export default function VerCaso({ casoId }) {
     const getCaso = () => {
         axios.get('http://localhost:8080/caso/{id}'.replace('{id}', casoId))
             .then(response => {
+                console.log(response.data)
                 setCaso(response.data[0])
             });
     }
@@ -106,7 +107,7 @@ export default function VerCaso({ casoId }) {
                             <p>Finalizado: {caso.finalizado ? 'Si' : 'No'}</p>
                         </Grid>
                         <Grid item xs={4}>
-                            <p>Última actualización: {caso.updatedAt.substring(0,10)}</p>
+                            <p>Última actualización: {caso.updatedAt}</p>
                         </Grid>
                     </Grid>
                     <Grid container spacing={3}>
