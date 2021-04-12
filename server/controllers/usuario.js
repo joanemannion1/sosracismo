@@ -95,6 +95,22 @@ exports.getAllNationalities = (req, result) => {
     })
 };
 
+//Retrieve different sedes
+exports.getAllSedes = (req, result) => {
+  const email = req.params.email;
+  Usuario.findAll({
+    where: {
+      trabajadorId: email
+    },
+    attributes: [[Sequelize.fn('DISTINCT', Sequelize.col('sedeId')), 'sede']]
+  })
+    .then(data => {
+      result.send(data);
+    }).catch(error => {
+      result.status(400).send(error)
+    })
+};
+
 //Get number of users by nationalities for excel
 exports.getCountUserByNationalities = (req, res) => {
   db.databaseConf.query("SELECT nacionalidad, SUM(CASE WHEN genero = 'h' THEN 1 END) AS hombre ,SUM(CASE WHEN genero = 'm' THEN 1 END) AS mujer FROM Usuario GROUP BY nacionalidad").then(results => {

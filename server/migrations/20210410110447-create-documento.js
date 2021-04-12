@@ -2,14 +2,17 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.createTable('Documentos', {
+      id: {
+        allowNull: false,
+        autoIncrement: true,
+        primaryKey: true,
+        type: Sequelize.INTEGER
+      },
       nombre: {
         type: Sequelize.STRING
       },
       type: {
         type: Sequelize.STRING
-      },
-      data: {
-        type: Sequelize.BLOB
       },
       file_path: {
         type: Sequelize.STRING

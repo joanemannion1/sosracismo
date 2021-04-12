@@ -55,6 +55,6 @@ db.internas.belongsTo(db.trabajadoras_hogar,{foreignKey:'id', as:'externaId'})
 db.necesidadextranjeria.belongsTo(db.extranjerias,{foreignKey:'id', as:'necesidadId'})
 
 db.intervenciones.belongsTo(db.casos,{foreignKey:'casoId', as:'caso'})
-db.documentos.belongsTo(db.intervenciones,{foreignKey:'id', as:'intervencionId'})
+db.documentos.belongsTo(db.intervenciones,{foreignKey:'intervencionId', as:'intervencion'})
 module.exports = db;
 

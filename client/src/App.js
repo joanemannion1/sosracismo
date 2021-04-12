@@ -16,6 +16,7 @@ import AñadirCaso from './components/pages/AñadirCaso'
 import VerCaso from './components/pages/VerCaso'
 import CrearSede from './components/pages/AñadirSede'
 import VerCasosNoFinalizados from './components/pages/VerCasosNoFinalizados'
+import VerIntervenciones from './components/pages/VerIntervenciones'
 import history from './history';
 
 
@@ -38,6 +39,7 @@ function App() {
           <Route exact path="/SideBar" render={() => ((!localStorage.getItem('token')) ? <Redirect to="/LogIn"/> : (<FilterSideBar />))}/>
           <Route exact path="/CasosNoFinalizados" render={() => ((!localStorage.getItem('token')) ? <Redirect to="/LogIn"/> : (<VerCasosNoFinalizados />))}/>
           <Route exact path="/CrearSede" render={() => ((!localStorage.getItem('token')) ? <Redirect to="/LogIn"/> : (<CrearSede />))}/>
+          <Route exact path="/VerIntervencion/:caso" render={({match}) => ((!localStorage.getItem('token')) ? <Redirect to="/LogIn"/> : (<VerIntervenciones casoId={match.params.caso}/>))}/>
         </Switch> 
       </Router>
     );

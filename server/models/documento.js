@@ -16,7 +16,6 @@ module.exports = (sequelize, DataTypes) => {
   Documento.init({
     nombre: DataTypes.STRING,
     type: DataTypes.STRING,
-    data: DataTypes.BLOB,
     file_path: DataTypes.STRING
   }, {
     sequelize,

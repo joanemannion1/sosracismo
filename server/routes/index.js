@@ -37,6 +37,8 @@ router.get("/usuarios/all/:email", usuario.getAllUsuarios);
 router.get("/usuario/getByDocumentacion/:ndoc", usuario.getUsuarioWithDocumentacion);
 // // Retrieve distinct nationalities
 router.get("/usuarios/nacionalidad/:email", usuario.getAllNationalities);
+// // Retrieve distinct sedes
+router.get("/usuarios/sede/:email", usuario.getAllSedes);
 //
 router.get("/usuarios/genero", usuario.getCountUserByNationalities);
 
@@ -80,6 +82,10 @@ router.get("/casoType/:id", caso.getCasoType);
 router.get("/caso/finalizar/:id", caso.finalizarCaso);
 
 //Create new Intervencion
-router.post("/intervencion/create" , intervencion.create);
+router.post("/intervencion/createdoc", intervencion.createDoc)
+// //Download file by path
+router.get("/file/download/:id" ,intervencion.downloadFileByName)
+// //Download file by path
+router.get("/intervenciones/caso/:casoId" ,intervencion.getAllByCaso)
 
 module.exports = router;

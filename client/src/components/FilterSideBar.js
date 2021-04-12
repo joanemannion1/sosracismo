@@ -81,13 +81,22 @@ export default function FilterSideBar() {
     }
 
     const getSede = async () => {
+        return fetch('http://localhost:8080/usuarios/sede/{email}'.replace('{email}', localStorage.email))
+            .then(response => response.json())
+            .then(data => {
+                const newArray = [];
+                data.map((val) => {
+                    console.log(val.sede)
+                    newArray.push(val.sede);});
+                setCheckedSede(newArray)
+            });
+    }
+
+    const getSedesAll = async () => {
         return fetch('http://localhost:8080/sedes/all')
             .then(response => response.json())
             .then(data => {
                 setSede(data)
-                const newArray = [];
-                data.map((val) => {newArray.push(val.sedeId);});
-                setCheckedSede(newArray)
             });
     }
 
@@ -101,7 +110,8 @@ export default function FilterSideBar() {
 
 
     useEffect(() => { getNacionalidad()}, []);
-    useEffect(() => { getSede() }, []);    
+    useEffect(() => { getSede() }, []);
+    useEffect(() => { getSedesAll() }, []);    
     return (
         <div className={classes.root}>
             <CssBaseline />
