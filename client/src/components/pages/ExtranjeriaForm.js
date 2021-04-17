@@ -9,18 +9,20 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormControl from '@material-ui/core/FormControl';
 import FormLabel from '@material-ui/core/FormLabel';
 import Snackbar from '@material-ui/core/Snackbar';
+import Button from '@material-ui/core/Button';
 import MuiAlert from '@material-ui/lab/Alert';
 
 function Alert(props) {
-	return <MuiAlert elevation={6} variant="filled" {...props} />;
+    return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
 
-export default function ExtranjeriaForm({usuario, caso}) {
+export default function ExtranjeriaForm({ usuario, caso }) {
     const isAddMode = !caso;
 
     // MUI ALERT
     const [open, setOpen] = useState()
     const [error, setError] = useState()
+    const [newCasoId, setNewCasoId] = useState()
 
     const handleClose = (event, reason) => {
         if (reason === 'clickaway') {
@@ -44,7 +46,7 @@ export default function ExtranjeriaForm({usuario, caso}) {
     const onClickAyudas = () => { setShowAyudas(!showAyudas) };
     const onClickDiscriminacion = () => { setShowDiscriminacion(!showDiscriminacion) };
 
-    const { register, errors, handleSubmit, setValue, getValues} = useForm();
+    const { register, errors, handleSubmit, setValue, getValues } = useForm();
 
     const handleToggle = (event) => {
 
@@ -63,7 +65,7 @@ export default function ExtranjeriaForm({usuario, caso}) {
 
     const handleChange = (event) => {
         setSelectedProyecto(event.target.value);
-      };
+    };
 
     const onSubmit = (data, e) => {
         data = {
@@ -74,28 +76,31 @@ export default function ExtranjeriaForm({usuario, caso}) {
 
         }
         return isAddMode
-        ? createCaso(data, e)
-        : updateCaso(caso, data);
+            ? createCaso(data, e)
+            : updateCaso(caso, data);
     }
     const createCaso = (data, e) => {
         axios.post('http://localhost:8080/caso/create/extranjeria', { data }).then(res => {
-            console.log(res);
             setOpen(true);
-            e.target.reset();
+            setNewCasoId(res.data.caso)
         }).catch((error) => {
             setError(true)
-           })
+        })
 
     }
 
-    
+    const goToVerCaso = () => {
+        history.push('/VerCaso/{caso}'.replace('{caso}', newCasoId));
+    }
+
+
     const updateCaso = (caso, data) => {
         axios.post('http://localhost:8080/caso/update/extranjeria/{id}'.replace('{id}', caso), { data }).then(res => {
             console.log(res);
             setOpen(true);
         }).catch((error) => {
             setError(true)
-           })
+        })
 
     }
 
@@ -136,9 +141,9 @@ export default function ExtranjeriaForm({usuario, caso}) {
 
                             {
                                 proyectosList.map((val, i) => {
-                                     return (
-                                            <FormControlLabel value={val.value} control={<Radio />} label={val.label} />
-                                        );
+                                    return (
+                                        <FormControlLabel value={val.value} control={<Radio />} label={val.label} />
+                                    );
                                 })
                             }
                         </RadioGroup>
@@ -149,7 +154,7 @@ export default function ExtranjeriaForm({usuario, caso}) {
                     <div className="p-1 mb-1 bg-light text-dark" onClick={onClickExtranjeria}>Extranjería <i className="fas fa-arrow-down"></i></div>
                     <div className={showExtranjeria ? 'card-body' : 'hidden'}>
                         {
-                        
+
                             extranjeriaList.map((val, i) => {
                                 if (i % 2) {
                                     return (
@@ -278,12 +283,15 @@ export default function ExtranjeriaForm({usuario, caso}) {
                 </div>
 
 
-                <button type="submit" name="submit" onClick={handleSubmit(onSubmit)} className="btn btn-primary" >{ isAddMode ? 'Añadir Caso' : 'Actualizar caso' }</button>
+                <button type="submit" name="submit" onClick={handleSubmit(onSubmit)} className="btn btn-primary" >{isAddMode ? 'Añadir Caso' : 'Actualizar caso'}</button>
             </form>
             <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
                 <Alert onClose={handleClose} severity="success">
                     El caso ha sido {isAddMode ? 'añadido' : 'actualizado'} correctamente!
-        				</Alert>
+                    <Button size="small" onClick={goToVerCaso}>
+                        VER CASO
+                    </Button>
+        		</Alert>
             </Snackbar>
 
             <Snackbar open={error} autoHideDuration={6000} onClose={handleClose}>

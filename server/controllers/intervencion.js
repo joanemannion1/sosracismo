@@ -88,3 +88,40 @@ exports.getAllByCaso = (req, res) => {
     });
 };
 
+//Delete intervención by Id
+exports.deleteById = (req, result) => {
+    var id = req.params.id;
+    Intervencion.destroy({
+        where: {
+            id: id
+        }
+    }).then(num => {
+            if (num === 1) {
+                Documento.destroy({
+                    where: { intervencion: id }
+                  }).then(num => {
+                    if (num === 1) {
+                      result.send({
+                        message: "La intervención ha sido eliminado correctamente."
+                      });
+                    } else {
+                      result.send({
+                        message: `No se ha podido eliminar la intervención con id=${id}!`
+                      });
+                    }
+                })
+                result.send({
+                    message: "La intervención ha sido eliminado correctamente."
+                  });
+            } else {
+              result.send({
+                message: `No se ha podido eliminar la intervención con id=${id}!`
+              });
+            }
+    }).catch(err => {
+      result.status(500).send({
+        message: err.message || `Ha habido algun error eliminando la intervención con id=${id}!`
+      });
+    });
+}
+

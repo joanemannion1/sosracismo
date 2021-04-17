@@ -1,8 +1,8 @@
 import './css/App.css';
 import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
 import { Router, Switch, Route, Redirect } from 'react-router-dom';
-import React from 'react';
-
+import React, {useState, useEffect} from 'react';
+import auth from './components/auth'
 //importar componentes
 import AñadirUsuario from './components/pages/AñadirUsuario';
 import VerUsuario from './components/pages/VerUsuario';
@@ -17,16 +17,20 @@ import VerCaso from './components/pages/VerCaso'
 import CrearSede from './components/pages/AñadirSede'
 import VerCasosNoFinalizados from './components/pages/VerCasosNoFinalizados'
 import VerIntervenciones from './components/pages/VerIntervenciones'
+import ExportExcel from './components/pages/ExportExcel'
 import history from './history';
-
-
+import axios from 'axios';
 
 function App() {
+  
+    console.log(auth.isAuthenticated())
+
     return (
       <Router history={history}>
         <Switch>
           <Route path='/LogIn' exact component={LogIn}/>
-          <Route exact path="/" render={() => ((!localStorage.getItem('token')) ? <Redirect to="/LogIn"/> : (<AñadirUsuario />))}/>
+          <Route exact path="/" render={() => (<AñadirUsuario />)}/>
+          <Route exact path="/ExportExcel" render={(match) => ((!localStorage.getItem('token')) ? <Redirect to="/LogIn"/> : (<ExportExcel />))}/>
           <Route exact path="/AñadirUsuario" render={({match}) => ((!localStorage.getItem('token')) ? <Redirect to="/LogIn"/> : (<AñadirUsuario usuario={false}/>))}/>
           <Route exact path="/AñadirUsuario/:usuario" render={({match}) => ((!localStorage.getItem('token')) ? <Redirect to="/LogIn"/> : (<AñadirUsuario usuario={match.params.usuario}/>))}/>
           <Route exact path="/AñadirCaso/:usuario" render={({match}) => ((!localStorage.getItem('token')) ? <Redirect to="/LogIn"/> : (<AñadirCaso user={match.params.usuario} />))}/>

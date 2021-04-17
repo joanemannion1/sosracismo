@@ -2,20 +2,23 @@ import React, { useState, useEffect } from 'react';
 import SearchBar from '../SearchBar'
 import { PlusCircleFill } from 'react-bootstrap-icons';
 import { Button, Modal, Container, Row, Col } from 'react-bootstrap';
-import ExportInformation from '../ExportInformation'
+import axios from 'axios'
 import { makeStyles } from '@material-ui/core/styles';
 import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 import IconButton from '@material-ui/core/IconButton';
 import history from '../../history';
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
+import { Router, Switch, Route, Redirect } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
     margin: {
-      margin: theme.spacing(1),
+        margin: theme.spacing(1),
     },
     extendedIcon: {
-      marginRight: theme.spacing(1),
+        marginRight: theme.spacing(1),
     },
-  }));
+}));
 
 export default function VerUsuario(filters) {
     const classes = useStyles();
@@ -26,6 +29,8 @@ export default function VerUsuario(filters) {
     const [openModal, setOpenModal] = useState(false);
     const [requiredItem, setRequiredItem] = useState(0);
     const [usuario, setUsuario] = useState({ 'nombre': '', 'email': '' });
+
+    const MySwal = withReactContent(Swal)
 
     const sendWhatsapp = (number) => {
         const href = "https://wa.me/34" + number;
@@ -55,12 +60,50 @@ export default function VerUsuario(filters) {
         history.push('/AñadirUsuario/{usuario}'.replace('{usuario}', usr.n_documentacion));
     }
 
-    const goToAñadirUsuario = () => {
-        history.push('/AñadirUsuario');
-    }
-
     const goToVerCaso = (index) => {
         history.push('/VerCaso/{caso}'.replace('{caso}', index));
+    }
+
+    const eliminarUsuario = (n_documentacion) => {
+        MySwal.fire({
+            title: 'Estas segura?',
+            text: "Este usuario será eliminado!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            confirmButtonText: 'Si, eliminar!',
+            cancelButtonText: 'No, cancelar!!',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                axios.delete('http://localhost:8080/usuario/delete/{id}'.replace('{id}', n_documentacion))
+                    .then(res => {
+                        MySwal.fire(
+                            'Eliminado!',
+                            'El usuario ha sido eliminado.',
+                            'success'
+                        )
+                        window.location.href = window.location.href
+                    })
+                    .catch(err => {
+                        MySwal.fire(
+                            'Ha habido algun error!',
+                            'El usuario no se ha eliminado.',
+                            'warning'
+                        )
+                    })
+
+            } else if (
+                /* Read more about handling dismissals below */
+                result.dismiss === Swal.DismissReason.cancel
+            ) {
+                MySwal.fire(
+                    'Cancelado',
+                    'El usuario no se ha eliminado :)',
+                    'error'
+                )
+            }
+        })
     }
 
 
@@ -112,7 +155,7 @@ export default function VerUsuario(filters) {
                         onChange={updateInput} />
                     </Col>
 
-                    {/* <Col md={{ span: 4, offset: 4 }}><ExportInformation data={usuarios}/></Col> */}
+                    {/* <Col md={4}> <button className = "btn btn-primary" onClick={goToExportarDatos} > <i class="fas fa-file-download"></i> Exportar datos</button></Col> */}
 
                 </Row>
 
@@ -156,6 +199,9 @@ export default function VerUsuario(filters) {
                                                                 <button type='button' className='btn btn-outline-info btn-circle btn-lg btn-circle ml-2' onClick={() => goToEditarUsuario(i)}>
                                                                     <i className='fa fa-edit'></i>
                                                                 </button>
+                                                                <button type='button' onClick={() => eliminarUsuario(val.n_documentacion)} className='btn btn-outline-danger btn-circle btn-lg btn-circle ml-2'>
+                                                                    <i className='fa fa-trash'></i>
+                                                                </button>
                                                             </td>
                                                         </tr>
                                                     </>
@@ -192,7 +238,7 @@ export default function VerUsuario(filters) {
                             </Col>
                         </Row>
                         <Row>
-                            <Col md={12}>
+                            <Col md={12} style={{ textAlignVertical: "center", textAlign: "center", }}>
                                 <h5>Casos:</h5>
                                 {allCasos.map((val, index) => {
                                     if (val.n_documentacion === usuario.n_documentacion) {
@@ -213,7 +259,6 @@ export default function VerUsuario(filters) {
 
                 <Modal.Footer>
                     <Button variant="secondary" onClick={handleClose}>Close</Button>
-                    <Button variant="primary" onClick={handleClose}>Save changes</Button>
                 </Modal.Footer>
             </Modal>
         </>

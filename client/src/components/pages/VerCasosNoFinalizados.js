@@ -2,9 +2,14 @@ import React, { useState, useEffect } from 'react';
 import history from '../../history';
 import { PlusCircleFill } from 'react-bootstrap-icons';
 import Menu from '../Navbar'
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
+import axios from 'axios';
 
 export default function VerCasosNoFinalizados() {
     const [AllCasos, setAllCasos] = useState([]);
+
+    const MySwal = withReactContent(Swal)
 
     const getCasos = async () => {
         return fetch('http://localhost:8080/casos/allActive/{email}'.replace('{email}', localStorage.email))
@@ -20,6 +25,48 @@ export default function VerCasosNoFinalizados() {
 
     const goToAñadirIntervencion = (index) => {
         history.push('/AñadirIntervencion/{id}'.replace('{id}', index));
+    }
+
+    const eliminarCaso = (id) => {
+        MySwal.fire({
+            title: 'Estas segura?',
+            text: "Este caso será eliminado!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            confirmButtonText: 'Si, eliminar!',
+            cancelButtonText: 'No, cancelar!!',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                axios.delete('http://localhost:8080/caso/delete/{id}'.replace('{id}', id))
+                    .then(res => {
+                        MySwal.fire(
+                            'Eliminado!',
+                            'El caso ha sido eliminado.',
+                            'success'
+                        )
+                        window.location.href = window.location.href
+                    })
+                    .catch(err => {
+                        MySwal.fire(
+                            'Ha habido algun error!',
+                            'El caso no se ha eliminado.',
+                            'warning'
+                        )
+                    })
+
+            } else if (
+                /* Read more about handling dismissals below */
+                result.dismiss === Swal.DismissReason.cancel
+            ) {
+                MySwal.fire(
+                    'Cancelado',
+                    'El caso no se ha eliminado :)',
+                    'error'
+                )
+            }
+        })
     }
 
     useEffect(() => { getCasos() }, []);
@@ -60,6 +107,9 @@ export default function VerCasosNoFinalizados() {
                                                 </button>
                                                 <button type='button' className='btn btn-outline-info btn-circle btn-lg btn-circle ml-2' onClick={() => goToVerCaso(val.id)}>
                                                     <i className='fa fa-edit'></i>
+                                                </button>
+                                                <button type='button' onClick={() => eliminarCaso(val.id)} className='btn btn-outline-danger btn-circle btn-lg btn-circle ml-2'>
+                                                    <i className='fa fa-trash'></i>
                                                 </button>
                                             </td>
                                         </tr>

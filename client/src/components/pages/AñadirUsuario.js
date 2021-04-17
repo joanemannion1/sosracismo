@@ -5,22 +5,17 @@ import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
 import { makeStyles } from '@material-ui/core/styles';
 import Menu from '../Navbar'
+import { Redirect } from 'react-router-dom';
+import auth from '../auth';
 
 function Alert(props) {
 	return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
 
 
-const useStyles = makeStyles((theme) => ({
-	root: {
-		width: '100%',
-		'& > * + *': {
-			marginTop: theme.spacing(2),
-		},
-	},
-}));
+export default function AñadirUsuario({ usuario }) {
+	console.log(auth.getEmail())
 
-export default function AñadirUsuario({usuario}) {
 	const isAddMode = !usuario;
 
 	const { register, errors, handleSubmit, setValue } = useForm();
@@ -35,7 +30,7 @@ export default function AñadirUsuario({usuario}) {
 			.catch(err => {
 				console.log(err);
 			})
-	},[]);
+	}, []);
 
 	const onSubmit = (data, e) => {
 		data = {
@@ -43,8 +38,8 @@ export default function AñadirUsuario({usuario}) {
 			trabajadorId: localStorage.email
 		}
 		return isAddMode
-            ? createUser(data)
-            : updateUser(usuario, data);
+			? createUser(data)
+			: updateUser(usuario, data);
 
 	}
 
@@ -63,15 +58,15 @@ export default function AñadirUsuario({usuario}) {
 	}
 
 	const getUser = () => {
-		if(!isAddMode) {
+		if (!isAddMode) {
 			axios.get('http://localhost:8080/usuario/getByDocumentacion/{n_doc}'.replace('{n_doc}', usuario))
-            .then(response => {
-                setUser(response.data[0])
-				const userVar = response.data[0]
-				const fields = ['nombre', 'apellido1', 'apellido2', 'tipo_documentacion', 'n_documentacion','genero', 'sedeId', 'trabajadorId', 'email', 'telefono', 'direccion', 'cp', 'localidad', 'provincia', 'pais_origen', 'nacionalidad']
-				fields.forEach(field => setValue(field, userVar[field]));
-                
-            });
+				.then(response => {
+					setUser(response.data[0])
+					const userVar = response.data[0]
+					const fields = ['nombre', 'apellido1', 'apellido2', 'tipo_documentacion', 'n_documentacion', 'genero', 'sedeId', 'trabajadorId', 'email', 'telefono', 'direccion', 'cp', 'localidad', 'provincia', 'pais_origen', 'nacionalidad']
+					fields.forEach(field => setValue(field, userVar[field]));
+
+				});
 		}
 	}
 
@@ -83,14 +78,16 @@ export default function AñadirUsuario({usuario}) {
 		setOpen(false);
 	};
 
+
 	useEffect(() => { getUser() }, []);
 
 	return (
 		<>
-		<Menu />
+
+			<Menu />
 			<div className="container padding25">
 				<form onSubmit={handleSubmit(onSubmit)}>
-					<h3>{ isAddMode ? 'Añadir Usuario' : 'Actualizar usuario' }</h3>
+					<h3>{isAddMode ? 'Añadir Usuario' : 'Actualizar usuario'}</h3>
 					<div className="card mb-3">
 						<div className="card-header text-white bg-secondary">Información personal</div>
 						<div className="card-body">
@@ -739,11 +736,11 @@ export default function AñadirUsuario({usuario}) {
 						</div>
 					</div>
 
-					<button type="submit" name="submit" className="btn btn-primary">{ isAddMode ? 'Añadir Usuario' : 'Actualizar usuario' }</button>
+					<button type="submit" name="submit" className="btn btn-primary">{isAddMode ? 'Añadir Usuario' : 'Actualizar usuario'}</button>
 
 					<Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
 						<Alert onClose={handleClose} severity="success">
-							El usuario ha sido { isAddMode ? 'añadido' : 'actualizado' } correctamente!
+							El usuario ha sido {isAddMode ? 'añadido' : 'actualizado'} correctamente!
         				</Alert>
 					</Snackbar>
 					<div className="modal" tabIndex="-1" role="dialog" id="confirmationModal">

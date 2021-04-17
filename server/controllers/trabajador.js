@@ -119,21 +119,22 @@ exports.logIn = (request, result) => {
         });
       }
 
-      var token = jwt.sign({ nombre: user.nombre }, config.secret, {
-        expiresIn: 86400 // 24 hours
+      var token = jwt.sign({ email: user.email, admin: user.admin }, config.secret, {
+        expiresIn:  300, //5minutu probazeko//86400 // 24 hours
       });
 
-      result.status(200).send({
-        nombre: user.nombre,
-        email: user.email,
-        sede: user.sedeId,
-        admin: user.admin,
-        accessToken: token
-      });
+      result.json({auth: true, accessToken: token, result: {nombre: user.nombre, sede: user.sede, admin: user.admin, email:user.email}})
+      // result.status(200).send({
+      //   nombre: user.nombre,
+      //   sede: user.sedeId,
+      //   admin: user.admin,
+      //   accessToken: token
+      // });
     }).catch(err => {
       result.status(500).send({ message: err.message });
     });
 }
+
 // Delete a Trabajador with the specified id in the request
 exports.deleteTrabajadorByEmail = (request, result) => {
     const paramEmail = request.params.email;

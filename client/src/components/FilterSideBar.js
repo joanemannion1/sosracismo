@@ -7,10 +7,14 @@ import VerUsuario from './pages/VerUsuario';
 import PublicIcon from '@material-ui/icons/Public';
 import WcIcon from '@material-ui/icons/Wc';
 import HomeWorkIcon from '@material-ui/icons/HomeWork';
+import DateRangeIcon from '@material-ui/icons/DateRange';
 import Collapse from '@material-ui/core/Collapse';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import Navbar from './Navbar'
+import history from '../history';
+import { nacionalidadList } from './NacionalidadList'
+
 const drawerWidth = 240;
 
 const useStyles = makeStyles((theme) => ({
@@ -39,11 +43,21 @@ const useStyles = makeStyles((theme) => ({
 export default function FilterSideBar() {
     const classes = useStyles();
     const [checkedNacionalidad, setCheckedNacionalidad] = useState([]);
-    const [openSede, setOpenSede] = React.useState(false);
+    const [openSede, setOpenSede] = React.useState(false)
+    const [openDate, setOpenDate] = React.useState(false);
     const [openNacionalidad, setOpenNacionalidad] = React.useState(false);
     const [nacionalidad, setNacionalidad] = useState([]);
     const [sede, setSede] = useState([]);
     const [checkedSede, setCheckedSede] = useState([]);
+    const todayDate = new Date()
+    const [startDate, setStartDate] = useState('');
+    const [endDate, setEndDate] = useState(todayDate.toISOString().substring(0, 10));
+
+    const goToExportarDatos = () => {
+        history.push({
+            pathname: '/ExportExcel', state: { startDate: startDate, endDate: endDate }
+        });
+    }
 
     const handleToggleNacionalidad = (value) => () => {
         const currentIndex = checkedNacionalidad.indexOf(value);
@@ -73,9 +87,9 @@ export default function FilterSideBar() {
         return fetch('http://localhost:8080/usuarios/nacionalidad/{email}'.replace('{email}', localStorage.email))
             .then(response => response.json())
             .then(data => {
-               setNacionalidad(data)
+                setNacionalidad(data)
                 const newArray = [];
-                data.map((val) => {newArray.push(val.nacionalidad);});
+                data.map((val) => { newArray.push(val.nacionalidad); });
                 setCheckedNacionalidad(newArray)
             });
     }
@@ -86,8 +100,8 @@ export default function FilterSideBar() {
             .then(data => {
                 const newArray = [];
                 data.map((val) => {
-                    console.log(val.sede)
-                    newArray.push(val.sede);});
+                    newArray.push(val.sede);
+                });
                 setCheckedSede(newArray)
             });
     }
@@ -100,8 +114,22 @@ export default function FilterSideBar() {
             });
     }
 
+    const filterDate = (e) => {
+        if (e.target.name === 'fechaInicio') {
+            console.log(e.target.value)
+            setStartDate(e.target.value)
+        } else if (e.target.name === 'fechaFin') {
+            setEndDate(e.target.value)
+        }
+
+    }
+
     const handleClick = () => {
         setOpenSede(!openSede);
+    };
+
+    const handleDate = () => {
+        setOpenDate(!openDate);
     };
 
     const handleNacionalidad = () => {
@@ -109,9 +137,9 @@ export default function FilterSideBar() {
     };
 
 
-    useEffect(() => { getNacionalidad()}, []);
+    useEffect(() => { getNacionalidad() }, []);
     useEffect(() => { getSede() }, []);
-    useEffect(() => { getSedesAll() }, []);    
+    useEffect(() => { getSedesAll() }, []);
     return (
         <div className={classes.root}>
             <CssBaseline />
@@ -146,7 +174,7 @@ export default function FilterSideBar() {
                                     nacionalidad.map((val, i) => {
                                         return (
                                             <>
-                                               
+
                                                 <ListItem button className={classes.nested} key={"nac_" + i} onClick={handleToggleNacionalidad(val.nacionalidad ? val.nacionalidad : null)}>
                                                     <ListItemIcon>
                                                         <Checkbox
@@ -155,10 +183,10 @@ export default function FilterSideBar() {
                                                             checked={checkedNacionalidad.indexOf(val.nacionalidad ? val.nacionalidad : null) !== -1}
                                                             tabIndex={-1}
                                                             disableRipple
-                                                            inputProps={{ 'aria-label': {i}} }
+                                                            inputProps={{ 'aria-label': { i } }}
                                                         />
                                                     </ListItemIcon>
-                                                    <ListItemText primary={val.nacionalidad ? val.nacionalidad : 'Sin Nacionalidaad'} />
+                                                    <ListItemText primary={val.nacionalidad ? nacionalidadList.find(x => x.value === val.nacionalidad).label : ' '} />
                                                 </ListItem>
                                             </>
                                         )
@@ -181,7 +209,7 @@ export default function FilterSideBar() {
                         </ListItem>
                         <Collapse in={openSede} timeout="auto" unmountOnExit>
                             <List component="div" disablePadding>
-                            {
+                                {
                                     sede.map((val, i) => {
                                         return (
                                             <>
@@ -204,12 +232,41 @@ export default function FilterSideBar() {
                                 }
                             </List>
                         </Collapse>
+
+                        <ListItem button onClick={handleDate}>
+                            <ListItemIcon>
+                                <DateRangeIcon />
+                            </ListItemIcon>
+                            <ListItemText primary="Fecha (necesidad)" />
+                            {openDate ? <ExpandLess /> : <ExpandMore />}
+                        </ListItem>
+                        <Collapse in={openDate} timeout="auto" unmountOnExit>
+                            <List component="div" disablePadding>
+                                <ListItem>
+                                    <h6>Desde: </h6>
+                                </ListItem>
+                                <ListItem>
+                                    <input type="date" className="form-control" value={startDate} name="fechaInicio" onChange={(e) => filterDate(e)} />
+                                </ListItem>
+                                <ListItem>
+                                    <h6>Hasta: </h6>
+                                </ListItem>
+                                <ListItem>
+                                    <input type="date" className="form-control" value={endDate} name="fechaFin" onChange={(e) => filterDate(e)} />
+                                </ListItem>
+                            </List>
+                        </Collapse>
+                        <ListItem >
+                            <button className="btn btn-primary" onClick={goToExportarDatos} > <i class="fas fa-file-download"></i> Exportar datos</button>
+                        </ListItem>
+
+
                     </List>
                 </div>
             </Drawer>
             <main className={classes.content}>
                 <Toolbar />
-                <VerUsuario filters={{'nacionalidad' : checkedNacionalidad, 'sede': checkedSede}}/>
+                <VerUsuario filters={{ 'nacionalidad': checkedNacionalidad, 'sede': checkedSede }} />
             </main>
         </div>
     );

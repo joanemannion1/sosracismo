@@ -289,9 +289,13 @@ exports.createExtranjeria = (req, res) => {
             id: data.id,
             necesidad: necesidadVar
           })
+          
         })
-    })
+        
+      })
+      res.send({message: " El caso ha sido añadido correctamente", caso: data.id})
   })
+ 
 
 };
 
@@ -321,7 +325,7 @@ exports.updateExtranjeria = (req, res) => {
       })
       .catch(err => {
           res.status(500).send({
-            message: "Could not delete Necesidad with id=" + id
+            message: "Could not delte Necesidad with id=" + id
           });
         });
     } else {
@@ -352,6 +356,7 @@ exports.getAllCasos = (req, result) => {
       result.status(400).send(error)
     })
 };
+
 
 // Retrieve caso by id
 exports.getCasoById = (req, result) => {
@@ -450,3 +455,80 @@ exports.getAllCasosNoFinalizados = (req, result) => {
       result.status(400).send(error)
     })
 };
+
+//Delete caso by Id
+exports.deleteById = (req, result) => {
+  var id = req.params.id;
+  Interna.destroy({
+    where: { id: id }
+  }).catch(err => {
+    result.status(500).send({
+      message: err.message || `Ha habido algun error eliminando el caso con id=${id}!`
+    });
+  });
+  
+  Externa.destroy({
+    where: { id: id }
+  }).catch(err => {
+    result.status(500).send({
+      message: err.message || `Ha habido algun error eliminando el caso con id=${id}!`
+    });
+  });
+  
+  TrabajadoraHogar.destroy({
+    where: { id: id }
+  }).catch(err => {
+    result.status(500).send({
+      message: err.message || `Ha habido algun error eliminando el caso con id=${id}!`
+    });
+  });
+
+  Discriminacion.destroy({
+    where: { id: id }
+  }).catch(err => {
+    result.status(500).send({
+      message: err.message || `Ha habido algun error eliminando el caso con id=${id}!`
+    });
+  });
+  NecesidadExtranjeria.destroy({
+    where: { id: id }
+  }).catch(err => {
+    result.status(500).send({
+      message: err.message || `Ha habido algun error eliminando el caso con id=${id}!`
+    });
+  });
+  Extranjeria.destroy({
+    where: { id: id }
+  }).catch(err => {
+    result.status(500).send({
+      message: err.message || `Ha habido algun error eliminando el caso con id=${id}!`
+    });
+  });
+  Caso.destroy({
+      where: {
+          id: id
+      }
+  }).then(num => {
+          if (num === 1) {
+              result.send({
+                  message: "El caso ha sido eliminado correctamente."
+                });
+          } else {
+            result.send({
+              message: `No se ha podido eliminar el caso con id=${id}!`
+            });
+          }
+  }).catch(err => {
+    result.status(500).send({
+      message: err.message || `Ha habido algun error eliminando el caso con id=${id}!`
+    });
+  });
+}
+
+exports.getNecesidadWithUser = (req, res) => {
+  start = req.body.startDate
+  end = req.body.endDate
+  db.databaseConf.query("SELECT NecesidadExtranjeria.necesidad, SUM(CASE WHEN Usuario.genero = 'h' THEN 1 END) AS hombre ,SUM(CASE WHEN Usuario.genero = 'm' THEN 1 END) AS mujer FROM NecesidadExtranjeria LEFT OUTER JOIN Caso on NecesidadExtranjeria.id = Caso.id Left Outer Join Usuario ON Caso.n_documentacion = Usuario.n_documentacion  WHERE NecesidadExtranjeria.updatedAt <= '" + end + "' AND NecesidadExtranjeria.updatedAt >= '" + start + "' GROUP BY NecesidadExtranjeria.necesidad").then(results => {
+    res.send(results[0])
+  });
+}

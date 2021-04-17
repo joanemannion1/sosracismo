@@ -2,6 +2,7 @@ const db = require("../models");
 const Usuario = db.usuarios;
 const Sequelize = require('sequelize');
 const { param } = require("../routes");
+const caso = require("../controllers/caso");
 
 // Create and Save a new Usuario
 exports.create = (req, res) => {
@@ -70,7 +71,7 @@ exports.getUsuarioWithDocumentacion = (req, result) => {
     where: {
       n_documentacion: ndoc
     },
-    attributes: ['nombre', 'apellido1', 'apellido2', 'tipo_documentacion', 'n_documentacion','genero', 'sedeId', 'trabajadorId', 'email', 'telefono', 'direccion', 'cp', 'localidad', 'provincia', 'pais_origen', 'nacionalidad']
+    attributes: ['nombre', 'apellido1', 'apellido2', 'tipo_documentacion', 'n_documentacion', 'genero', 'sedeId', 'trabajadorId', 'email', 'telefono', 'direccion', 'cp', 'localidad', 'provincia', 'pais_origen', 'nacionalidad']
   })
     .then(data => {
       result.send(data);
@@ -114,6 +115,13 @@ exports.getAllSedes = (req, result) => {
 //Get number of users by nationalities for excel
 exports.getCountUserByNationalities = (req, res) => {
   db.databaseConf.query("SELECT nacionalidad, SUM(CASE WHEN genero = 'h' THEN 1 END) AS hombre ,SUM(CASE WHEN genero = 'm' THEN 1 END) AS mujer FROM Usuario GROUP BY nacionalidad").then(results => {
+    res.send(results[0])
+  });
+}
+
+//Get number of users by necesidades for excel
+exports.getCountUserByNecesidad = (req, res) => {
+  db.databaseConf.query("SELECT NecesidadExtranjeria.necesidad, SUM(CASE WHEN Usuario.genero = 'h' THEN 1 END) AS hombre ,SUM(CASE WHEN Usuario.genero = 'm' THEN 1 END) AS mujer FROM NecesidadExtranjeria LEFT OUTER JOIN Caso on NecesidadExtranjeria.id = Caso.id Left Outer Join Usuario ON Caso.n_documentacion = Usuario.n_documentacion GROUP BY NecesidadExtranjeria.necesidad").then(results => {
     res.send(results[0])
   });
 }
@@ -162,3 +170,27 @@ exports.update = (req, res) => {
       });
     });
 };
+
+exports.deleteByNDoc = (req, res) => {
+  var ndoc = req.params.ndoc;
+
+  Usuario.destroy({
+    where: {
+      n_documentacion: id
+    }
+  }).then(num => {
+    if (num === 1) {
+      result.send({
+        message: "El usuario ha sido eliminado correctamente."
+      });
+    } else {
+      result.send({
+        message: `No se ha podido eliminar el usuario con id=${ndoc}!`
+      });
+    }
+  }).catch(err => {
+    result.status(500).send({
+      message: err.message || `Ha habido algun error eliminando el usuario con id=${ndoc}!`
+    });
+  });
+}

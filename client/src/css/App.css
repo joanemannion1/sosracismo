@@ -67,3 +67,9 @@ padding:25px;
 .custom-dialog {width:48% !important; top:20%;}
 
 .hidden { display:none; }
+
+table#table-to-xls {
+  text-align:center; 
+    margin-left:auto; 
+    margin-right:auto; 
+}

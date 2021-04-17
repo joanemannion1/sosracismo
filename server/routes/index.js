@@ -6,7 +6,24 @@ const caso = require("../controllers/caso");
 const intervencion = require("../controllers/intervencion");
 const express = require("express");
 const router = express.Router();
+const jwt = require('jsonwebtoken')
+const config = require("../config/auth.config.js");
 
+const verifyJWT = (req,res,next) => {
+    const token = req.headers['x-access-token']
+    console.log(token)
+    if (token === 'null') {
+        res.send({auth: false, message: "El token es nulo"})
+    } else {
+        jwt.verify(token,  config.secret, (err, decoded) => {
+            if (err) {
+                res.send({auth: false, message: "No se ha podido autenticar usuario"});
+            } else {
+                res.status(200).send({auth: true, message: "Estar correctamente autenticado",  email : decoded.email, admin: decoded.admin});
+            }
+        })
+    }
+}
 // Create New trabajador
 router.post("/trabajador/create" ,trabajador.create);
 // // Retrieve all trabajadores
@@ -21,7 +38,8 @@ router.delete("/trabajador/delete/:email", trabajador.deleteTrabajadorByEmail);
 router.delete("/trabajadores/deleteAll", trabajador.deleteAllTrabajadores);
 //Log in trabajador
 router.post("/trabajador/login", trabajador.logIn);
-
+//Log in trabajador
+router.get("/authenticate/trabajador", verifyJWT);
 // Create New sede
 router.post("/sede/create", sede.create);
 // // Retrieve all sedes
@@ -40,8 +58,11 @@ router.get("/usuarios/nacionalidad/:email", usuario.getAllNationalities);
 // // Retrieve distinct sedes
 router.get("/usuarios/sede/:email", usuario.getAllSedes);
 //
-router.get("/usuarios/genero", usuario.getCountUserByNationalities);
-
+router.get("/usuarios/count/nacionalidad", usuario.getCountUserByNationalities);
+//
+router.get("/usuarios/count/necesidad", usuario.getCountUserByNecesidad);
+//Delete user by nº documentación
+router.delete("/usuario/delete/:ndoc", usuario.deleteByNDoc)
 
 //Create new Cita
 router.post("/cita/create" , cita.create);
@@ -78,14 +99,20 @@ router.get("/casoEspecifico/extranjeria/:id", caso.getCasoEspecificoExtranjeriaI
 router.get("/necesidad/:id", caso.getNecesidadExtranjeriaId);
 // // Retrieve Caso Especifico by Id
 router.get("/casoType/:id", caso.getCasoType);
-// // Retrieve Caso Especifico by Id
+// // Retrieve Necesidad with User Id
+router.post("/necesidadUsuario/", caso.getNecesidadWithUser);
+// // Finalizar Caso Especifico by Id
 router.get("/caso/finalizar/:id", caso.finalizarCaso);
+//Delete intervención by id
+router.delete("/caso/delete/:id", caso.deleteById)
 
 //Create new Intervencion
 router.post("/intervencion/createdoc", intervencion.createDoc)
+//Delete intervención by id
+router.delete("/intervencion/delete/:id", intervencion.deleteById)
 // //Download file by path
 router.get("/file/download/:id" ,intervencion.downloadFileByName)
-// //Download file by path
+// //Get intervencion by id
 router.get("/intervenciones/caso/:casoId" ,intervencion.getAllByCaso)
 
 module.exports = router;
