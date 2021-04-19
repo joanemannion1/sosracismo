@@ -8,8 +8,8 @@ export const extranjeriaList = [
         label: 'ARCE arraigo social con contrato'
     },
     {
-        value: 'ARCE arraigo social sin contrato ???',
-        label: 'ARCE arraigo social sin contrato'
+        value: 'ARCE arraigo laboral',
+        label: 'ARCE arraigo laboral'
     },
     {
         value: 'ARCE arraigo familiar por ascendiente',

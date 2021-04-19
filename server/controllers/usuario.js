@@ -1,5 +1,6 @@
 const db = require("../models");
 const Usuario = db.usuarios;
+const Nacionalidad = db.nacionalidades;
 const Sequelize = require('sequelize');
 const { param } = require("../routes");
 const caso = require("../controllers/caso");
@@ -28,16 +29,17 @@ exports.create = (req, res) => {
     localidad: req.body.data.localidad,
     cp: req.body.data.cp ? req.body.data.cp : null,
     provincia: req.body.data.provincia,
-    nacionalidad: req.body.data.nacionalidad,
     pais_origen: req.body.data.pais_origen,
     sedeId: req.body.data.sedeId,
     trabajadorId: req.body.data.trabajadorId,
   };
-
-  console.log(usuario);
   // Save Tutorial in the database
   Usuario.create(usuario)
     .then(data => {
+      req.body.data.nacionalidad.map(nacionalidad => {
+        console.log(nacionalidad)
+        Nacionalidad.create({ nacionalidad: nacionalidad.value, n_documentacion: data.n_documentacion })
+      })
       res.send(data);
     })
     .catch(err => {
@@ -51,49 +53,29 @@ exports.create = (req, res) => {
 // Retrieve all Usuarios from the database.
 exports.getAllUsuarios = (req, result) => {
   const email = req.params.email;
-  Usuario.findAll({
-    where: {
-      trabajadorId: email
-    },
-    attributes: ['telefono', 'n_documentacion', 'nombre', 'apellido1', 'apellido2', 'telefono', 'email', 'nacionalidad', 'sedeId', 'genero', 'trabajadorId']
+  db.databaseConf.query("SELECT Usuario.*, Nacionalidad.nacionalidad FROM Usuario LEFT OUTER JOIN Nacionalidad on Usuario.n_documentacion = Nacionalidad.n_documentacion WHERE Usuario.trabajadorId = '" + email + "'").then(results => {
+    result.send(results[0])
+  }).catch(error => {
+    result.status(400).send(error)
   })
-    .then(data => {
-      result.send(data);
-    }).catch(error => {
-      result.status(400).send(error)
-    })
 };
 
 // Retrieve Usuario with n_documentacion from the database.
 exports.getUsuarioWithDocumentacion = (req, result) => {
   const ndoc = req.params.ndoc;
-  Usuario.findAll({
-    where: {
-      n_documentacion: ndoc
-    },
-    attributes: ['nombre', 'apellido1', 'apellido2', 'tipo_documentacion', 'n_documentacion', 'genero', 'sedeId', 'trabajadorId', 'email', 'telefono', 'direccion', 'cp', 'localidad', 'provincia', 'pais_origen', 'nacionalidad']
+  db.databaseConf.query("SELECT Usuario.*, Nacionalidad.nacionalidad FROM Usuario LEFT OUTER JOIN Nacionalidad on Usuario.n_documentacion = Nacionalidad.n_documentacion WHERE Usuario.n_documentacion = '" + ndoc + "'").then(results => {
+    result.send(results[0])
+  }).catch(error => {
+    result.status(400).send(error)
   })
-    .then(data => {
-      result.send(data);
-    }).catch(error => {
-      result.status(400).send(error)
-    })
 };
 
 //Retrieve different nationalities
 exports.getAllNationalities = (req, result) => {
   const email = req.params.email;
-  Usuario.findAll({
-    where: {
-      trabajadorId: email
-    },
-    attributes: [[Sequelize.fn('DISTINCT', Sequelize.col('nacionalidad')), 'nacionalidad']]
-  })
-    .then(data => {
-      result.send(data);
-    }).catch(error => {
-      result.status(400).send(error)
-    })
+  db.databaseConf.query("SELECT DISTINCT Nacionalidad.nacionalidad FROM Usuario LEFT OUTER JOIN Nacionalidad on Usuario.n_documentacion = Nacionalidad.n_documentacion WHERE Nacionalidad.nacionalidad IS NOT NULL AND Usuario.trabajadorId = '" + email + "'").then(results => {
+    result.send(results[0])
+  });
 };
 
 //Retrieve different sedes
@@ -114,7 +96,7 @@ exports.getAllSedes = (req, result) => {
 
 //Get number of users by nationalities for excel
 exports.getCountUserByNationalities = (req, res) => {
-  db.databaseConf.query("SELECT nacionalidad, SUM(CASE WHEN genero = 'h' THEN 1 END) AS hombre ,SUM(CASE WHEN genero = 'm' THEN 1 END) AS mujer FROM Usuario GROUP BY nacionalidad").then(results => {
+  db.databaseConf.query("SELECT Nacionalidad.nacionalidad, SUM(CASE WHEN Usuario.genero = 'h' THEN 1 END) AS hombre ,SUM(CASE WHEN Usuario.genero = 'm' THEN 1 END) AS mujer FROM Usuario LEFT OUTER JOIN Nacionalidad ON Usuario.n_documentacion = Nacionalidad.n_documentacion WHERE Nacionalidad.nacionalidad IS NOT NULL GROUP BY Nacionalidad.nacionalidad").then(results => {
     res.send(results[0])
   });
 }
@@ -144,7 +126,6 @@ exports.update = (req, res) => {
     localidad: req.body.data.localidad,
     cp: req.body.data.cp ? req.body.data.cp : null,
     provincia: req.body.data.provincia,
-    nacionalidad: req.body.data.nacionalidad,
     pais_origen: req.body.data.pais_origen,
     sedeId: req.body.data.sedeId,
     trabajadorId: req.body.data.trabajadorId,
@@ -155,6 +136,14 @@ exports.update = (req, res) => {
   })
     .then(num => {
       if (num == 1) {
+        Nacionalidad.destroy({
+          where: {
+            n_documentacion: id
+          }
+        })
+        req.body.data.nacionalidad.map(nacionalidad => {
+          Nacionalidad.create({ nacionalidad: nacionalidad.value, n_documentacion: id })
+        })
         res.send({
           message: "User was updated successfully."
         });
@@ -193,4 +182,25 @@ exports.deleteByNDoc = (req, res) => {
       message: err.message || `Ha habido algun error eliminando el usuario con id=${ndoc}!`
     });
   });
+}
+
+exports.checkTelefono = (req,res) => {
+  const tfn = req.params.telefono;
+  Usuario.findAll({
+    where: {
+      telefono: tfn
+    },
+    attributes: ['nombre', 'apellido1', 'apellido2', 'genero', 'email', 'pais_origen']
+  })
+    .then(data => {
+      if(data.length > 0){
+        res.send({userExists:true});
+      }
+      else {
+        res.send({userExists:false});
+      }
+        
+    }).catch(error => {
+      res.status(400).send(error)
+    })
 }

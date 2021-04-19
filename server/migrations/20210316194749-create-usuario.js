@@ -44,9 +44,6 @@ module.exports = {
       pais_residencia: {
         type: Sequelize.STRING
       },
-      nacionalidad: {
-        type: Sequelize.STRING
-      },
       pais_origen: {
         type: Sequelize.STRING
       },

@@ -3,6 +3,8 @@ import { useForm } from 'react-hook-form';
 import axios from 'axios';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
+import Button from '@material-ui/core/Button';
+import history from '../../history';
 
 function Alert(props) {
 	return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -14,6 +16,8 @@ export default function TrabajadoraHogarForm({ usuario , caso }) {
      // MUI ALERT
      const [open, setOpen] = useState()
      const [error, setError] = useState()
+
+     const [newCasoId, setNewCasoId] = useState()
 
      const handleClose = (event, reason) => {
          if (reason === 'clickaway') {
@@ -41,7 +45,7 @@ export default function TrabajadoraHogarForm({ usuario , caso }) {
         axios.post('http://localhost:8080/caso/create/trabajadoraHogar', { data }).then(res => {
             console.log(res);
             setOpen(true);
-            e.target.reset();
+            setNewCasoId(res.data.caso)
         }).catch((error) => {
             setError(true)
            })
@@ -53,10 +57,15 @@ export default function TrabajadoraHogarForm({ usuario , caso }) {
         axios.post('http://localhost:8080/caso/update/trabajadoraHogar/{id}'.replace('{id}', caso), { data }).then(res => {
             console.log(res);
             setOpen(true);
+            setNewCasoId(caso)
         }).catch((error) => {
             setError(true)
            })
 
+    }
+
+    const goToVerCaso = () => {
+        history.push('/VerCaso/{caso}'.replace('{caso}', newCasoId));
     }
 
 
@@ -303,7 +312,8 @@ export default function TrabajadoraHogarForm({ usuario , caso }) {
             <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
                 <Alert onClose={handleClose} severity="success">
                     El caso ha sido {isAddMode ? 'añadido' : 'actualizado'} correctamente!
-        				</Alert>
+                {isAddMode ? <Button size="small" onClick={goToVerCaso}>VER CASO</Button> : null }
+        			</Alert>
             </Snackbar>
 
             <Snackbar open={error} autoHideDuration={6000} onClose={handleClose}>

@@ -73,7 +73,7 @@ export default function VerCasosNoFinalizados() {
 
     return (
         <>
-        <Menu />
+            <Menu />
             <div className="w-75 container padding25">
                 <div className="table-responsive">
                     <table className="table no-wrap user-table mb-0" aria-label="tabla de usuarios">
@@ -82,8 +82,8 @@ export default function VerCasosNoFinalizados() {
                                 <th scope="col" className="border-0 text-uppercase font-medium pl-4">#</th>
                                 <th scope="col" className="border-0 text-uppercase font-medium">Usuario</th>
                                 <th scope="col" className="border-0 text-uppercase font-medium">Finalizado</th>
-                                <th scope="col" className="border-0 text-uppercase font-medium">Editar</th>
                                 <th scope="col" className="border-0 text-uppercase font-medium">Última actualización</th>
+                                <th scope="col" className="border-0 text-uppercase font-medium">Editar</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -93,22 +93,23 @@ export default function VerCasosNoFinalizados() {
                                         <tr key={i}>
                                             <td className="pl-4">{val.id}</td>
                                             <td>
-                                                <h5 className="font-medium mb-o">{val.n_documentacion}</h5>
+                                                <h5 className="font-medium mb-o">{val.nombre} {val.apellido1} {val.apellido2}</h5>
+                                                <span className="text-muted">{val.n_documentacion}</span>
                                             </td>
                                             <td>
                                                 <span className="text-muted" >{val.finalizado ? 'Si' : 'No'}</span><br />
                                             </td>
                                             <td>
-                                                <span className="text-muted" >{val.updatedAt.substring(0,10)}</span><br />
+                                                <span className="text-muted" >{val.updatedAt.substring(0, 10)}</span><br />
                                             </td>
                                             <td>
-                                                <button type='button' className='btn btn-outline-info btn-circle btn-lg btn-circle ml-2' onClick={() => goToAñadirIntervencion(val.id)}>
+                                                <button type='button' title="Añadir intervención" className='btn btn-outline-info btn-circle btn-lg btn-circle ml-2' onClick={() => goToAñadirIntervencion(val.id)}>
                                                     <PlusCircleFill />
                                                 </button>
-                                                <button type='button' className='btn btn-outline-info btn-circle btn-lg btn-circle ml-2' onClick={() => goToVerCaso(val.id)}>
+                                                <button type='button' title="Actualizar caso" className='btn btn-outline-info btn-circle btn-lg btn-circle ml-2' onClick={() => goToVerCaso(val.id)}>
                                                     <i className='fa fa-edit'></i>
                                                 </button>
-                                                <button type='button' onClick={() => eliminarCaso(val.id)} className='btn btn-outline-danger btn-circle btn-lg btn-circle ml-2'>
+                                                <button type='button' title="Eliminar caso" onClick={() => eliminarCaso(val.id)} className='btn btn-outline-danger btn-circle btn-lg btn-circle ml-2'>
                                                     <i className='fa fa-trash'></i>
                                                 </button>
                                             </td>

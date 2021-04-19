@@ -56,9 +56,6 @@ module.exports = (sequelize, DataTypes) => {
     pais_residencia: {
       type: DataTypes.STRING
     },
-    nacionalidad: {
-      type: DataTypes.STRING
-    },
     pais_origen: {
       type: DataTypes.STRING
     }

@@ -34,7 +34,6 @@ export default function VerCaso({ casoId }) {
     const getCaso = () => {
         axios.get('http://localhost:8080/caso/{id}'.replace('{id}', casoId))
             .then(response => {
-                console.log(response.data)
                 setCaso(response.data[0])
             });
     }

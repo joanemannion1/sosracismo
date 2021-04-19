@@ -4,6 +4,7 @@ import axios from 'axios';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
 import history from '../../history';
+import Button from '@material-ui/core/Button';
 
 function Alert(props) {
 	return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -16,6 +17,8 @@ export default function DiscriminacionForm({ usuario, caso }) {
 
     const [selectedTipo, setSelectedTipo] = useState("Conflicto");
     const [selectedEstrategia, setSelectedEstrategia] = useState("Asumir");
+
+    const [newCasoId, setNewCasoId] = useState()
 
     // MUI ALERT
     const [open, setOpen] = useState()
@@ -34,6 +37,9 @@ export default function DiscriminacionForm({ usuario, caso }) {
     const showTipo = (event) => { setSelectedTipo(event.target.value) }
     const showEstrategia = (event) => { setSelectedEstrategia(event.target.value) }
 
+    const goToVerCaso = () => {
+        history.push('/VerCaso/{caso}'.replace('{caso}', newCasoId));
+    }
 
 
     const onSubmit = (data, e) => {
@@ -45,16 +51,12 @@ export default function DiscriminacionForm({ usuario, caso }) {
         return isAddMode
             ? createCaso(data, e)
             : updateCaso(caso, data);
-
-
-
     }
 
     const createCaso = (data, e) => {
         axios.post('http://localhost:8080/caso/create/discriminacion', { data }).then(res => {
-            console.log(res);
-            setOpen(true);
-            e.target.reset();
+            setNewCasoId(res.data.caso)    
+            setOpen(true);  
         }).catch((error) => {
             setError(true)
            })
@@ -63,19 +65,22 @@ export default function DiscriminacionForm({ usuario, caso }) {
 
     const updateCaso = (caso, data) => {
         axios.post('http://localhost:8080/caso/update/discriminacion/{id}'.replace('{id}', caso), { data }).then(res => {
-            console.log(res);
-            setOpen(true);
+            console.log(res)    
+        setOpen(true);
         }).catch((error) => {
             setError(true)
            })
 
     }
 
+    
+
     const getCasoEspecifico = () => {
         if (!isAddMode) {
             axios.get('http://localhost:8080/casoEspecifico/discriminacion/{id}'.replace('{id}', caso))
                 .then(response => {
                     const casoVar = response.data[0]
+                    console.log(casoVar)
                     const fields = ['Situacion_documental', 'situacion_residencial', 'estudios', 'rasgos_fenotipicos', 'tipo', 'conflicto', 'denegacion_privada', 'denegacion_publica', 'racismo', 'agente_discriminador', 'relato_hechos', 'municipio', 'identificacion', 'testigos', 'otros', 'estrategia', 'asumir', 'derivar']
                     fields.forEach(field => setValue(field, casoVar[field]));
                     setValue('fecha', casoVar['fecha'].substring(0, 10))
@@ -284,7 +289,9 @@ export default function DiscriminacionForm({ usuario, caso }) {
             <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
                 <Alert onClose={handleClose} severity="success">
                     El caso ha sido {isAddMode ? 'añadido' : 'actualizado'} correctamente!
-        				</Alert>
+                    {isAddMode ? <Button size="small" onClick={goToVerCaso}>VER CASO</Button> : null }
+        		</Alert>
+                
             </Snackbar>
 
             <Snackbar open={error} autoHideDuration={6000} onClose={handleClose}>

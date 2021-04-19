@@ -9,6 +9,7 @@ const TrabajadoraHogar = db.trabajadoras_hogar;
 const Sequelize = require('sequelize');
 const { param } = require("../routes");
 const trabajadorahogar = require("../models/trabajadorahogar");
+const usuario = require("../models/usuario");
 
 // Create and Save a new Caso Discriminacion
 exports.createDiscriminacion = (req, res) => {
@@ -53,7 +54,7 @@ exports.createDiscriminacion = (req, res) => {
       }
       console.log(discriminacionVar)
       Discriminacion.create(discriminacionVar).then(data => {
-        res.send(data);
+        res.send({message: " El caso ha sido añadido correctamente", caso: data.id})
       }).catch(err => {
         res.status(500).send({
           message:
@@ -173,9 +174,8 @@ exports.createTrabajadoraHogar = (req, res) => {
             permiso_salida: req.body.data.permiso_salida,
             descanso_semanal: req.body.data.descanso_semanal,
           };
-          console.log(internaVar)
           Interna.create(internaVar).then(data => {
-            res.send(data);
+            res.send({message: " El caso ha sido añadido correctamente", caso: data.id})
           }).catch(err => {
             res.status(500).send({
               message:
@@ -187,7 +187,7 @@ exports.createTrabajadoraHogar = (req, res) => {
             id: data.id
           }
           Externa.create(externa).then(data => {
-            res.send(data);
+            res.send({message: " El caso ha sido añadido correctamente", caso: data.id})
           }).catch(err => {
             res.status(500).send({
               message:
@@ -284,7 +284,6 @@ exports.createExtranjeria = (req, res) => {
       }
       Extranjeria.create(extranjeriaVar).then(data => {
         req.body.data.necesidad.map(necesidadVar => {
-          console.log(necesidadVar)
           NecesidadExtranjeria.create({
             id: data.id,
             necesidad: necesidadVar
@@ -443,14 +442,8 @@ exports.finalizarCaso = (req, result) => {
 // Retrieve all casos from database 
 exports.getAllCasosNoFinalizados = (req, result) => {
   const email = req.params.email;
-  Caso.findAll({
-    where: {
-      trabajadorId: email,
-      finalizado: 0
-    },
-  })
-    .then(data => {
-      result.send(data);
+  db.databaseConf.query("SELECT Caso.*, Usuario.nombre AS nombre, Usuario.apellido1 , Usuario.apellido2 FROM Caso Left Join Usuario on Caso.n_documentacion = Usuario.n_documentacion WHERE Caso.finalizado = 0 AND Caso.trabajadorId = '" + email + "'").then(results => {
+    result.send(results[0])
     }).catch(error => {
       result.status(400).send(error)
     })

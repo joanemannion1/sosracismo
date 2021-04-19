@@ -20,6 +20,7 @@ export default function ExportExcel() {
         return fetch('http://localhost:8080/usuarios/count/nacionalidad'.replace('{email}', localStorage.email))
             .then(response => response.json())
             .then(data => {
+                console.log(data)
                 setNacionalidad(data);
             });
     }

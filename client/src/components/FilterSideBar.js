@@ -90,6 +90,7 @@ export default function FilterSideBar() {
                 setNacionalidad(data)
                 const newArray = [];
                 data.map((val) => { newArray.push(val.nacionalidad); });
+                console.log(newArray)
                 setCheckedNacionalidad(newArray)
             });
     }

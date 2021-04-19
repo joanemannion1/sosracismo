@@ -24,6 +24,7 @@ db.databaseConf = database;
 db.trabajadores = require("./trabajador")(database, Sequelize);
 db.sedes = require("./sede")(database, Sequelize);
 db.usuarios = require("./usuario")(database, Sequelize);
+db.nacionalidades = require("./nacionalidad")(database, Sequelize);
 db.citas = require("./cita")(database, Sequelize);
 db.usuario_cita_trabajador = require("./cita_usuario_trabajador")(database, Sequelize);
 db.casos = require("./caso")(database, Sequelize);
@@ -43,7 +44,6 @@ db.usuarios.belongsTo(db.trabajadores, {foreignKey: 'trabajadorId', as: 'id_trab
 db.usuario_cita_trabajador.belongsTo(db.citas, {foreignKey: 'id', as: 'citaId'})
 db.usuario_cita_trabajador.belongsTo(db.trabajadores, {foreignKey: 'trabajadorId'})
 db.usuario_cita_trabajador.belongsTo(db.usuarios, {foreignKey: 'n_documentacion', as: 'usuarioID'})
-db.ROLES = ["trabajador", "admin"];
 
 db.casos.belongsTo(db.trabajadores, {foreignKey: 'trabajadorId', as: 'id_trabajador'})
 db.casos.belongsTo(db.usuarios, {foreignKey: 'n_documentacion', as: 'usuarioId'})
@@ -56,5 +56,7 @@ db.necesidadextranjeria.belongsTo(db.extranjerias,{foreignKey:'id', as:'necesida
 
 db.intervenciones.belongsTo(db.casos,{foreignKey:'casoId', as:'caso'})
 db.documentos.belongsTo(db.intervenciones,{foreignKey:'intervencionId', as:'intervencion'})
+
+db.nacionalidades.belongsTo(db.usuarios, {foreignKey: 'n_documentacion'})
 module.exports = db;
 

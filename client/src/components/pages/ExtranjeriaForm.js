@@ -96,7 +96,7 @@ export default function ExtranjeriaForm({ usuario, caso }) {
 
     const updateCaso = (caso, data) => {
         axios.post('http://localhost:8080/caso/update/extranjeria/{id}'.replace('{id}', caso), { data }).then(res => {
-            console.log(res);
+            setNewCasoId(caso)
             setOpen(true);
         }).catch((error) => {
             setError(true)

@@ -18,7 +18,6 @@ export default function VerIntervenciones({ casoId }) {
         return fetch('http://localhost:8080/intervenciones/caso/{casoId}'.replace('{casoId}', casoId))
             .then(response => response.json())
             .then(data => {
-                console.log(data)
                 setAllIntervenciones(data);
             });
     }
@@ -27,7 +26,6 @@ export default function VerIntervenciones({ casoId }) {
         axios.get('http://localhost:8080/file/download/{id}'.replace('{id}', id),{
             responseType: 'blob'
           }).then(res => {
-            console.log(res);
             return download(res.data, filename, type)
         }).catch((error) => {
         })

@@ -11,7 +11,6 @@ const config = require("../config/auth.config.js");
 
 const verifyJWT = (req,res,next) => {
     const token = req.headers['x-access-token']
-    console.log(token)
     if (token === 'null') {
         res.send({auth: false, message: "El token es nulo"})
     } else {
@@ -53,6 +52,8 @@ router.post("/usuario/update/:id" ,usuario.update);
 router.get("/usuarios/all/:email", usuario.getAllUsuarios);
 // // Retrieve Usuario by n_documentacion
 router.get("/usuario/getByDocumentacion/:ndoc", usuario.getUsuarioWithDocumentacion);
+// // Check if phone number already exists
+router.get("/usuario/checkTelefono/:telefono", usuario.checkTelefono);
 // // Retrieve distinct nationalities
 router.get("/usuarios/nacionalidad/:email", usuario.getAllNationalities);
 // // Retrieve distinct sedes

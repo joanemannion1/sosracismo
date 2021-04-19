@@ -9,7 +9,6 @@ import IconButton from '@material-ui/core/IconButton';
 import history from '../../history';
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
-import { Router, Switch, Route, Redirect } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
     margin: {
@@ -23,6 +22,7 @@ const useStyles = makeStyles((theme) => ({
 export default function VerUsuario(filters) {
     const classes = useStyles();
     const [usuarios, setUsuarios] = useState([]);
+    const [usuariosRepeated, setUsuariosRepeated] = useState([]);
     const [usuariosDefault, setUsuariosDefault] = useState([]);
     const [allCasos, setAllCasos] = useState([]);
     const [input, setInput] = useState('');
@@ -116,6 +116,7 @@ export default function VerUsuario(filters) {
                 const filteredUsers = data.filter(function (a) {
                     return !this[a.n_documentacion] && (this[a.n_documentacion] = true);
                 }, Object.create(null));
+                setUsuariosRepeated(data)
                 setUsuarios(filteredUsers)
                 setUsuariosDefault(filteredUsers)
                 setAllCasos(data);
@@ -131,12 +132,15 @@ export default function VerUsuario(filters) {
     }
 
     const updateInput = async (input) => {
-        const filtered = usuariosDefault.filter(user => {
+        const filtered = usuariosRepeated.filter(user => {
             const telefono = '' + (user.telefono ? user.telefono : ' ');
             return (((user.nombre.toLowerCase().includes(input.toLowerCase())) || (user.n_documentacion.toLowerCase().includes(input.toLowerCase())) || (telefono.includes(input.toLowerCase()))) && (filters.filters.nacionalidad.indexOf(user.nacionalidad) !== -1) && (filters.filters.sede.indexOf(user.sedeId) !== -1));
         })
+        const filtered2 = filtered.filter(function (a) {
+            return !this[a.n_documentacion] && (this[a.n_documentacion] = true);
+        }, Object.create(null));
         setInput(input);
-        setUsuarios(filtered);
+        setUsuarios(filtered2);
     }
 
 
@@ -193,13 +197,13 @@ export default function VerUsuario(filters) {
                                                                 <span className="text-muted" onClick={() => sendWhatsapp(val.telefono)}><i className="fa fa-whatsapp" aria-hidden="true"></i>{val.telefono ? val.telefono : '----'}</span>
                                                             </td>
                                                             <td>
-                                                                <button type='button' className='btn btn-outline-info btn-circle btn-lg btn-circle ml-2' onClick={() => goToAñadirCaso(i)}>
+                                                                <button type='button' title="Añadir caso" className='btn btn-outline-info btn-circle btn-lg btn-circle ml-2' onClick={() => goToAñadirCaso(i)}>
                                                                     <PlusCircleFill />
                                                                 </button>
-                                                                <button type='button' className='btn btn-outline-info btn-circle btn-lg btn-circle ml-2' onClick={() => goToEditarUsuario(i)}>
+                                                                <button type='button' title="Editar usuario" className='btn btn-outline-info btn-circle btn-lg btn-circle ml-2' onClick={() => goToEditarUsuario(i)}>
                                                                     <i className='fa fa-edit'></i>
                                                                 </button>
-                                                                <button type='button' onClick={() => eliminarUsuario(val.n_documentacion)} className='btn btn-outline-danger btn-circle btn-lg btn-circle ml-2'>
+                                                                <button type='button' title="Eliminar usuario" onClick={() => eliminarUsuario(val.n_documentacion)} className='btn btn-outline-danger btn-circle btn-lg btn-circle ml-2'>
                                                                     <i className='fa fa-trash'></i>
                                                                 </button>
                                                             </td>
