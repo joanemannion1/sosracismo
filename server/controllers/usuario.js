@@ -53,10 +53,16 @@ exports.create = (req, res) => {
 // Retrieve all Usuarios from the database.
 exports.getAllUsuarios = (req, result) => {
   const email = req.params.email;
-  db.databaseConf.query("SELECT Usuario.*, Nacionalidad.nacionalidad FROM Usuario LEFT OUTER JOIN Nacionalidad on Usuario.n_documentacion = Nacionalidad.n_documentacion WHERE Usuario.trabajadorId = '" + email + "'").then(results => {
-    result.send(results[0])
-  }).catch(error => {
-    result.status(400).send(error)
+  jwt.verify(email, config.secret, (err, decoded) => {
+    if (err) {
+      result.status(400).send({ auth: false, message: "No se ha podido autenticar usuario" });
+    } else {
+      db.databaseConf.query("SELECT Usuario.*, Nacionalidad.nacionalidad FROM Usuario LEFT OUTER JOIN Nacionalidad on Usuario.n_documentacion = Nacionalidad.n_documentacion WHERE Usuario.trabajadorId = '" + decoded.email + "'").then(results => {
+        result.send(results[0])
+      }).catch(error => {
+        result.status(400).send(error)
+      })
+    }
   })
 };
 
@@ -184,7 +190,7 @@ exports.deleteByNDoc = (req, res) => {
   });
 }
 
-exports.checkTelefono = (req,res) => {
+exports.checkTelefono = (req, res) => {
   const tfn = req.params.telefono;
   Usuario.findAll({
     where: {
@@ -193,13 +199,13 @@ exports.checkTelefono = (req,res) => {
     attributes: ['nombre', 'apellido1', 'apellido2', 'genero', 'email', 'pais_origen']
   })
     .then(data => {
-      if(data.length > 0){
-        res.send({userExists:true});
+      if (data.length > 0) {
+        res.send({ userExists: true });
       }
       else {
-        res.send({userExists:false});
+        res.send({ userExists: false });
       }
-        
+
     }).catch(error => {
       res.status(400).send(error)
     })

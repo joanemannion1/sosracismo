@@ -12,11 +12,11 @@ const config = require("../config/auth.config.js");
 const verifyJWT = (req,res,next) => {
     const token = req.headers['x-access-token']
     if (token === 'null') {
-        res.send({auth: false, message: "El token es nulo"})
+        res.status(400).send({auth: false, message: "El token es nulo"})
     } else {
         jwt.verify(token,  config.secret, (err, decoded) => {
             if (err) {
-                res.send({auth: false, message: "No se ha podido autenticar usuario"});
+                res.status(400).send({auth: false, message: "No se ha podido autenticar usuario"});
             } else {
                 res.status(200).send({auth: true, message: "Estar correctamente autenticado",  email : decoded.email, admin: decoded.admin});
             }
@@ -96,8 +96,10 @@ router.get("/casoEspecifico/discriminacion/:id", caso.getCasoEspecificoDiscrimin
 router.get("/casoEspecifico/trabajadora/:id", caso.getCasoEspecificoTrabajadoraId);
 // // Retrieve Caso Especifico by Id
 router.get("/casoEspecifico/extranjeria/:id", caso.getCasoEspecificoExtranjeriaId);
-// // Retrieve Caso Especifico by Id
+// // Retrieve Necesidades de un caso by Id
 router.get("/necesidad/:id", caso.getNecesidadExtranjeriaId);
+// // Retrieve Proyectos de un Caso by Id
+router.get("/proyecto/:id", caso.getProyectoExtranjeriaId);
 // // Retrieve Caso Especifico by Id
 router.get("/casoType/:id", caso.getCasoType);
 // // Retrieve Necesidad with User Id

@@ -16,6 +16,7 @@ import ListItemText from '@material-ui/core/ListItemText';
 import GroupIcon from '@material-ui/icons/Group';
 import Collapse from '@material-ui/core/Collapse';
 import Menu from '../Navbar'
+import { createFilterOptions } from '@material-ui/lab/Autocomplete';
 
 const drawerWidth = 300;
 
@@ -99,8 +100,11 @@ export default function Citas() {
         return fetch('http://localhost:8080/usuarios/all/{email}'.replace('{email}', localStorage.email))
             .then(response => response.json())
             .then(data => {
-                setUsuarios(data);
-                setUsuariosDefault(data);
+                const filteredUsers = data.filter(function (a) {
+                    return !this[a.n_documentacion] && (this[a.n_documentacion] = true);
+                }, Object.create(null));
+                setUsuarios(filteredUsers);
+                setUsuariosDefault(filteredUsers);
             });
     }
 
@@ -190,6 +194,11 @@ export default function Citas() {
             }
           })
     }
+    const filterOptions = createFilterOptions({
+        matchFrom: 'contain',
+        stringify: option => option.nombre + " " + option.apellido1 + " " + option.apellido2 + " " +option.telefono,
+      });
+
     const selectSlot = (slotInfo) => {
         let slotStart = new DateObject(slotInfo.start)
         let slotEnd = new DateObject(slotInfo.end)
@@ -250,11 +259,10 @@ export default function Citas() {
                             option: classes.option,
                         }}
                         autoHighlight
-                        filterOptions={x => x}
+                        filterOptions={filterOptions}
                         getOptionLabel={(option) => option.n_documentacion}
                         renderOption={(option) => (
                             <React.Fragment>
-                                <span>{option.nombre}</span>
                                 {option.nombre} {option.apellido1} +{option.telefono}
                             </React.Fragment>
                         )}

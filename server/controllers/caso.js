@@ -5,6 +5,7 @@ const Extranjeria = db.extranjerias;
 const Interna = db.internas;
 const Externa = db.externas;
 const NecesidadExtranjeria = db.necesidadextranjeria
+const ProyectoExtranjeria = db.proyectoextranjeria
 const TrabajadoraHogar = db.trabajadoras_hogar;
 const Sequelize = require('sequelize');
 const { param } = require("../routes");
@@ -280,7 +281,6 @@ exports.createExtranjeria = (req, res) => {
     .then(data => {
       const extranjeriaVar = {
         id: data.id,
-        proyectos: req.body.data.proyectos
       }
       Extranjeria.create(extranjeriaVar).then(data => {
         req.body.data.necesidad.map(necesidadVar => {
@@ -290,12 +290,17 @@ exports.createExtranjeria = (req, res) => {
           })
           
         })
+        req.body.data.proyectos.map(proyectoVar => {
+          ProyectoExtranjeria.create({
+            id: data.id,
+            proyecto: proyectoVar
+          })
+          
+        })
         
       })
       res.send({message: " El caso ha sido añadido correctamente", caso: data.id})
   })
- 
-
 };
 
 // Update and Save a Caso Extranjeria
@@ -303,7 +308,7 @@ exports.updateExtranjeria = (req, res) => {
   const id = req.params.id;
 
   const extranjeriaVar = {
-    proyectos: req.body.data.proyectos
+    id: id
   }
   Extranjeria.update(extranjeriaVar, {
     where:  { id: id }
@@ -313,10 +318,19 @@ exports.updateExtranjeria = (req, res) => {
         where: { id: id }
       })
       req.body.data.necesidad.map(necesidadVar => {
-        console.log(necesidadVar)
         NecesidadExtranjeria.create({
           id: id,
           necesidad: necesidadVar
+        })
+      })
+
+      ProyectoExtranjeria.destroy({
+        where: { id: id }
+      })
+      req.body.data.proyectos.map(proyectoVar => {
+        ProyectoExtranjeria.create({
+          id: id,
+          proyecto: proyectoVar
         })
       })
       res.send({
@@ -405,6 +419,21 @@ exports.getCasoEspecificoExtranjeriaId = (req, result) => {
 exports.getNecesidadExtranjeriaId = (req, result) => {
   const id = req.params.id;
   NecesidadExtranjeria.findAll({
+    where: {
+      id: id
+    },
+  })
+    .then(data => {
+      result.send(data);
+    }).catch(error => {
+      result.status(400).send(error)
+    })
+};
+
+// Retrieve all proyectos with Id
+exports.getProyectoExtranjeriaId = (req, result) => {
+  const id = req.params.id;
+  ProyectoExtranjeria.findAll({
     where: {
       id: id
     },

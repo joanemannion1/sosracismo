@@ -38,6 +38,7 @@ export default function ExtranjeriaForm({ usuario, caso }) {
     const [showAyudas, setShowAyudas] = useState(false);
     const [showDiscriminacion, setShowDiscriminacion] = useState(false);
     const [checkedNecesidad, setCheckedNecesidad] = useState([]);
+    const [checkedProyecto, setCheckedProyecto] = useState([]);
     const [selectedProyecto, setSelectedProyecto] = useState('');
 
     const onClickExtranjeria = () => { setShowExtranjeria(!showExtranjeria) };
@@ -63,8 +64,19 @@ export default function ExtranjeriaForm({ usuario, caso }) {
         setCheckedNecesidad(newChecked);
     };
 
-    const handleChange = (event) => {
-        setSelectedProyecto(event.target.value);
+    const handleToggleProyectos = (event) => {
+
+        const value = event.target.value
+        const currentIndex = checkedProyecto.indexOf(value);
+        const newChecked = [...checkedProyecto];
+
+        if (currentIndex === -1) {
+            newChecked.push(value);
+        } else {
+            newChecked.splice(currentIndex, 1);
+        }
+
+        setCheckedProyecto(newChecked);
     };
 
     const onSubmit = (data, e) => {
@@ -72,7 +84,7 @@ export default function ExtranjeriaForm({ usuario, caso }) {
             n_documentacion: usuario,
             trabajadorId: localStorage.email,
             necesidad: checkedNecesidad,
-            proyectos: selectedProyecto
+            proyectos: checkedProyecto
 
         }
         return isAddMode
@@ -80,6 +92,7 @@ export default function ExtranjeriaForm({ usuario, caso }) {
             : updateCaso(caso, data);
     }
     const createCaso = (data, e) => {
+        console.log(data)
         axios.post('http://localhost:8080/caso/create/extranjeria', { data }).then(res => {
             setOpen(true);
             setNewCasoId(res.data.caso)
@@ -125,6 +138,16 @@ export default function ExtranjeriaForm({ usuario, caso }) {
                     })
                     setCheckedNecesidad(checked)
                 });
+
+            axios.get('http://localhost:8080/proyecto/{id}'.replace('{id}', caso))
+                .then(response => {
+                    const casoVar = response.data
+                    const checked = []
+                    casoVar.map(proyecto => {
+                        checked.push(proyecto.proyecto)
+                    })
+                    setCheckedProyecto(checked)
+                });
         }
     }
 
@@ -137,7 +160,7 @@ export default function ExtranjeriaForm({ usuario, caso }) {
                 <div className="p-2 mb-2 bg-secondary text-white">Proyectos de la intervención</div>
                 <div>
                     <FormControl component="fieldset">
-                        <RadioGroup aria-label="proyecto" name="proyecto" value={selectedProyecto} onChange={handleChange}>
+                        {/* <RadioGroup aria-label="proyecto" name="proyecto" value={selectedProyecto} onChange={handleChange}>
 
                             {
                                 proyectosList.map((val, i) => {
@@ -146,7 +169,24 @@ export default function ExtranjeriaForm({ usuario, caso }) {
                                     );
                                 })
                             }
-                        </RadioGroup>
+                        </RadioGroup> */}
+                        {
+                            proyectosList.map((val, i) => {
+                                return (
+                                    <div className="form-row">
+                                        <div className="col-sm-11">
+                                            <div className="form-check">
+                                                <input className="form-check-input" type="checkbox" checked={checkedProyecto.indexOf(val.value) !== -1} value={val.value} onChange={e => handleToggleProyectos(e)} />
+                                                <label className="form-check-label">{val.label}</label>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                )
+
+                            })
+                        }
+
                     </FormControl>
                 </div>
                 <div className="p-2 mb-2 bg-secondary text-white">Necesidad de mi entidad</div>
@@ -291,7 +331,7 @@ export default function ExtranjeriaForm({ usuario, caso }) {
                     <Button size="small" onClick={goToVerCaso}>
                         VER CASO
                     </Button>
-        		</Alert>
+                </Alert>
             </Snackbar>
 
             <Snackbar open={error} autoHideDuration={6000} onClose={handleClose}>

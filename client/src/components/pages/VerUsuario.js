@@ -110,7 +110,7 @@ export default function VerUsuario(filters) {
     const handleClose = () => setOpenModal(false);
 
     const getData = async () => {
-        return await fetch('http://localhost:8080/usuarios/all/{email}'.replace('{email}', localStorage.email))
+        return await fetch('http://localhost:8080/usuarios/all/{email}'.replace('{email}', localStorage.token))
             .then(response => response.json())
             .then(data => {
                 const filteredUsers = data.filter(function (a) {
