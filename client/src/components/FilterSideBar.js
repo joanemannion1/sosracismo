@@ -84,7 +84,7 @@ export default function FilterSideBar() {
     };
 
     const getNacionalidad = async () => {
-        return fetch('http://localhost:8080/usuarios/nacionalidad/{email}'.replace('{email}', localStorage.email))
+        return fetch('http://localhost:8080/usuarios/nacionalidad/{email}'.replace('{email}', localStorage.token))
             .then(response => response.json())
             .then(data => {
                 setNacionalidad(data)
@@ -96,7 +96,7 @@ export default function FilterSideBar() {
     }
 
     const getSede = async () => {
-        return fetch('http://localhost:8080/usuarios/sede/{email}'.replace('{email}', localStorage.email))
+        return fetch('http://localhost:8080/usuarios/sede/{email}'.replace('{email}', localStorage.token))
             .then(response => response.json())
             .then(data => {
                 const newArray = [];

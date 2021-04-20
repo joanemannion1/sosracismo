@@ -97,7 +97,7 @@ export default function Citas() {
     });
     const classes = useStyles();
     const getUsers = async () => {
-        return fetch('http://localhost:8080/usuarios/all/{email}'.replace('{email}', localStorage.email))
+        return fetch('http://localhost:8080/usuarios/all/{email}'.replace('{email}', localStorage.token))
             .then(response => response.json())
             .then(data => {
                 const filteredUsers = data.filter(function (a) {

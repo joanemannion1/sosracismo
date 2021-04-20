@@ -124,7 +124,7 @@ export default function VerUsuario(filters) {
     }
 
     const getCasos = async () => {
-        return await fetch('http://localhost:8080/casos/all/{email}'.replace('{email}', localStorage.email))
+        return await fetch('http://localhost:8080/casos/all/{email}'.replace('{email}', localStorage.token))
             .then(response => response.json())
             .then(data => {
                 setAllCasos(data);

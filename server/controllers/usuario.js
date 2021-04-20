@@ -3,7 +3,8 @@ const Usuario = db.usuarios;
 const Nacionalidad = db.nacionalidades;
 const Sequelize = require('sequelize');
 const { param } = require("../routes");
-const caso = require("../controllers/caso");
+const jwt = require('jsonwebtoken')
+const config = require("../config/auth.config.js");
 
 // Create and Save a new Usuario
 exports.create = (req, res) => {
@@ -79,25 +80,41 @@ exports.getUsuarioWithDocumentacion = (req, result) => {
 //Retrieve different nationalities
 exports.getAllNationalities = (req, result) => {
   const email = req.params.email;
-  db.databaseConf.query("SELECT DISTINCT Nacionalidad.nacionalidad FROM Usuario LEFT OUTER JOIN Nacionalidad on Usuario.n_documentacion = Nacionalidad.n_documentacion WHERE Nacionalidad.nacionalidad IS NOT NULL AND Usuario.trabajadorId = '" + email + "'").then(results => {
-    result.send(results[0])
-  });
+  jwt.verify(email, config.secret, (err, decoded) => {
+    if (err) {
+      result.status(400).send({ auth: false, message: "No se ha podido autenticar usuario" });
+    } else {
+      db.databaseConf.query("SELECT DISTINCT Nacionalidad.nacionalidad FROM Usuario LEFT OUTER JOIN Nacionalidad on Usuario.n_documentacion = Nacionalidad.n_documentacion WHERE Nacionalidad.nacionalidad IS NOT NULL AND Usuario.trabajadorId = '" + decoded.email + "'").then(results => {
+        result.send(results[0])
+      }).catch(error => {
+        result.status(400).send(error)
+      })
+    }
+  })
+
 };
 
 //Retrieve different sedes
 exports.getAllSedes = (req, result) => {
   const email = req.params.email;
-  Usuario.findAll({
-    where: {
-      trabajadorId: email
-    },
-    attributes: [[Sequelize.fn('DISTINCT', Sequelize.col('sedeId')), 'sede']]
+  jwt.verify(email, config.secret, (err, decoded) => {
+    if (err) {
+      result.status(400).send({ auth: false, message: "No se ha podido autenticar usuario" });
+    } else {
+      Usuario.findAll({
+        where: {
+          trabajadorId: decoded.email
+        },
+        attributes: [[Sequelize.fn('DISTINCT', Sequelize.col('sedeId')), 'sede']]
+      })
+        .then(data => {
+          result.send(data);
+        }).catch(error => {
+          result.status(400).send(error)
+        })
+    }
   })
-    .then(data => {
-      result.send(data);
-    }).catch(error => {
-      result.status(400).send(error)
-    })
+
 };
 
 //Get number of users by nationalities for excel

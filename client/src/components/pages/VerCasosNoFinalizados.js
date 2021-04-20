@@ -12,7 +12,7 @@ export default function VerCasosNoFinalizados() {
     const MySwal = withReactContent(Swal)
 
     const getCasos = async () => {
-        return fetch('http://localhost:8080/casos/allActive/{email}'.replace('{email}', localStorage.email))
+        return fetch('http://localhost:8080/casos/allActive/{email}'.replace('{email}', localStorage.token))
             .then(response => response.json())
             .then(data => {
                 setAllCasos(data);

@@ -9,8 +9,8 @@ const ProyectoExtranjeria = db.proyectoextranjeria
 const TrabajadoraHogar = db.trabajadoras_hogar;
 const Sequelize = require('sequelize');
 const { param } = require("../routes");
-const trabajadorahogar = require("../models/trabajadorahogar");
-const usuario = require("../models/usuario");
+const jwt = require('jsonwebtoken')
+const config = require("../config/auth.config.js");
 
 // Create and Save a new Caso Discriminacion
 exports.createDiscriminacion = (req, res) => {
@@ -55,7 +55,7 @@ exports.createDiscriminacion = (req, res) => {
       }
       console.log(discriminacionVar)
       Discriminacion.create(discriminacionVar).then(data => {
-        res.send({message: " El caso ha sido añadido correctamente", caso: data.id})
+        res.send({ message: " El caso ha sido añadido correctamente", caso: data.id })
       }).catch(err => {
         res.status(500).send({
           message:
@@ -99,7 +99,7 @@ exports.updateDiscriminacion = (req, res) => {
   }
 
   Discriminacion.update(discriminacionVar, {
-    where:  { id: id }
+    where: { id: id }
   }).then(num => {
     if (num == 1) {
       res.send({
@@ -111,11 +111,11 @@ exports.updateDiscriminacion = (req, res) => {
       });
     }
   })
-  .catch(err => {
-    res.status(500).send({
-      message: "Error updating Caso with id=" + id
+    .catch(err => {
+      res.status(500).send({
+        message: "Error updating Caso with id=" + id
+      });
     });
-  });
 
 };
 
@@ -176,7 +176,7 @@ exports.createTrabajadoraHogar = (req, res) => {
             descanso_semanal: req.body.data.descanso_semanal,
           };
           Interna.create(internaVar).then(data => {
-            res.send({message: " El caso ha sido añadido correctamente", caso: data.id})
+            res.send({ message: " El caso ha sido añadido correctamente", caso: data.id })
           }).catch(err => {
             res.status(500).send({
               message:
@@ -188,7 +188,7 @@ exports.createTrabajadoraHogar = (req, res) => {
             id: data.id
           }
           Externa.create(externa).then(data => {
-            res.send({message: " El caso ha sido añadido correctamente", caso: data.id})
+            res.send({ message: " El caso ha sido añadido correctamente", caso: data.id })
           }).catch(err => {
             res.status(500).send({
               message:
@@ -247,7 +247,7 @@ exports.updateTrabajadoraHogar = (req, res) => {
   }
 
   TrabajadoraHogar.update(trabajadoraHogar, {
-    where:  { id: id }
+    where: { id: id }
   }).then(num => {
     if (num == 1) {
       res.send({
@@ -259,11 +259,11 @@ exports.updateTrabajadoraHogar = (req, res) => {
       });
     }
   })
-  .catch(err => {
-    res.status(500).send({
-      message: "Error updating Caso with id=" + id
+    .catch(err => {
+      res.status(500).send({
+        message: "Error updating Caso with id=" + id
+      });
     });
-  });
 
 };
 
@@ -288,19 +288,19 @@ exports.createExtranjeria = (req, res) => {
             id: data.id,
             necesidad: necesidadVar
           })
-          
+
         })
         req.body.data.proyectos.map(proyectoVar => {
           ProyectoExtranjeria.create({
             id: data.id,
             proyecto: proyectoVar
           })
-          
+
         })
-        
+
       })
-      res.send({message: " El caso ha sido añadido correctamente", caso: data.id})
-  })
+      res.send({ message: " El caso ha sido añadido correctamente", caso: data.id })
+    })
 };
 
 // Update and Save a Caso Extranjeria
@@ -311,7 +311,7 @@ exports.updateExtranjeria = (req, res) => {
     id: id
   }
   Extranjeria.update(extranjeriaVar, {
-    where:  { id: id }
+    where: { id: id }
   }).then(num => {
     if (num == 1) {
       NecesidadExtranjeria.destroy({
@@ -336,7 +336,7 @@ exports.updateExtranjeria = (req, res) => {
       res.send({
         message: "Caso was updated successfully."
       })
-      .catch(err => {
+        .catch(err => {
           res.status(500).send({
             message: "Could not delte Necesidad with id=" + id
           });
@@ -347,27 +347,34 @@ exports.updateExtranjeria = (req, res) => {
       });
     }
   })
-  .catch(err => {
-    res.status(500).send({
-      message: "Error updating Caso with id=" + id
+    .catch(err => {
+      res.status(500).send({
+        message: "Error updating Caso with id=" + id
+      });
     });
-  });
 
 };
 
 // Retrieve all casos from database 
 exports.getAllCasos = (req, result) => {
   const email = req.params.email;
-  Caso.findAll({
-    where: {
-      trabajadorId: email
-    },
+  jwt.verify(email, config.secret, (err, decoded) => {
+    if (err) {
+      result.status(400).send({ auth: false, message: "No se ha podido autenticar usuario" });
+    } else {
+      Caso.findAll({
+        where: {
+          trabajadorId: decoded.email
+        },
+      })
+        .then(data => {
+          result.send(data);
+        }).catch(error => {
+          result.status(400).send(error)
+        })
+    }
   })
-    .then(data => {
-      result.send(data);
-    }).catch(error => {
-      result.status(400).send(error)
-    })
+
 };
 
 
@@ -471,11 +478,18 @@ exports.finalizarCaso = (req, result) => {
 // Retrieve all casos from database 
 exports.getAllCasosNoFinalizados = (req, result) => {
   const email = req.params.email;
-  db.databaseConf.query("SELECT Caso.*, Usuario.nombre AS nombre, Usuario.apellido1 , Usuario.apellido2 FROM Caso Left Join Usuario on Caso.n_documentacion = Usuario.n_documentacion WHERE Caso.finalizado = 0 AND Caso.trabajadorId = '" + email + "'").then(results => {
-    result.send(results[0])
-    }).catch(error => {
-      result.status(400).send(error)
-    })
+  jwt.verify(email, config.secret, (err, decoded) => {
+    if (err) {
+      result.status(400).send({ auth: false, message: "No se ha podido autenticar usuario" });
+    } else {
+      db.databaseConf.query("SELECT Caso.*, Usuario.nombre AS nombre, Usuario.apellido1 , Usuario.apellido2 FROM Caso Left Join Usuario on Caso.n_documentacion = Usuario.n_documentacion WHERE Caso.finalizado = 0 AND Caso.trabajadorId = '" + decoded.email + "'").then(results => {
+        result.send(results[0])
+      }).catch(error => {
+        result.status(400).send(error)
+      })
+    }
+  })
+
 };
 
 //Delete caso by Id
@@ -488,7 +502,7 @@ exports.deleteById = (req, result) => {
       message: err.message || `Ha habido algun error eliminando el caso con id=${id}!`
     });
   });
-  
+
   Externa.destroy({
     where: { id: id }
   }).catch(err => {
@@ -496,7 +510,7 @@ exports.deleteById = (req, result) => {
       message: err.message || `Ha habido algun error eliminando el caso con id=${id}!`
     });
   });
-  
+
   TrabajadoraHogar.destroy({
     where: { id: id }
   }).catch(err => {
@@ -527,19 +541,19 @@ exports.deleteById = (req, result) => {
     });
   });
   Caso.destroy({
-      where: {
-          id: id
-      }
+    where: {
+      id: id
+    }
   }).then(num => {
-          if (num === 1) {
-              result.send({
-                  message: "El caso ha sido eliminado correctamente."
-                });
-          } else {
-            result.send({
-              message: `No se ha podido eliminar el caso con id=${id}!`
-            });
-          }
+    if (num === 1) {
+      result.send({
+        message: "El caso ha sido eliminado correctamente."
+      });
+    } else {
+      result.send({
+        message: `No se ha podido eliminar el caso con id=${id}!`
+      });
+    }
   }).catch(err => {
     result.status(500).send({
       message: err.message || `Ha habido algun error eliminando el caso con id=${id}!`
