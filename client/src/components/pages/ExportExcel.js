@@ -5,8 +5,16 @@ import { nacionalidadList } from '../NacionalidadList'
 import { useLocation } from "react-router-dom";
 import axios from 'axios';
 import { Button, Modal, Container, Row, Col } from 'react-bootstrap';
+import auth from '../auth';
+import history from '../../history';
 
 export default function ExportExcel() {
+    useEffect(() => {
+		if(!auth.isAuthenticated()) {
+			history.push('/LogIn')
+		}
+	}, []);
+    
     const [nacionalidad, setNacionalidad] = useState([]);
     const [necesidad, setNecesidad] = useState([]);
     const [startDate, setStartDate] = useState('');

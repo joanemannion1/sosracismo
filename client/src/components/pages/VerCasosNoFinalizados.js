@@ -1,12 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import history from '../../history';
 import { PlusCircleFill } from 'react-bootstrap-icons';
 import Menu from '../Navbar'
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import axios from 'axios';
+import auth from '../auth';
+import history from '../../history';
 
 export default function VerCasosNoFinalizados() {
+    useEffect(() => {
+		if(!auth.isAuthenticated()) {
+			history.push('/LogIn')
+		}
+	}, []);
     const [AllCasos, setAllCasos] = useState([]);
 
     const MySwal = withReactContent(Swal)

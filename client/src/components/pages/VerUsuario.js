@@ -6,9 +6,10 @@ import axios from 'axios'
 import { makeStyles } from '@material-ui/core/styles';
 import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 import IconButton from '@material-ui/core/IconButton';
-import history from '../../history';
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
+import auth from '../auth';
+import history from '../../history';
 
 const useStyles = makeStyles((theme) => ({
     margin: {
@@ -20,6 +21,12 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function VerUsuario(filters) {
+    useEffect(() => {
+		if(!auth.isAuthenticated()) {
+			history.push('/LogIn')
+		}
+	}, []);
+    
     const classes = useStyles();
     const [usuarios, setUsuarios] = useState([]);
     const [usuariosRepeated, setUsuariosRepeated] = useState([]);

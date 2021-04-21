@@ -4,6 +4,7 @@ import axios from 'axios';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
 import Button from '@material-ui/core/Button';
+import auth from '../auth';
 import history from '../../history';
 
 function Alert(props) {
@@ -11,6 +12,12 @@ function Alert(props) {
 }
 
 export default function TrabajadoraHogarForm({ usuario , caso }) {
+    useEffect(() => {
+		if(!auth.isAuthenticated()) {
+			history.push('/LogIn')
+		}
+	}, []);
+    
     const isAddMode = !caso;
 
      // MUI ALERT

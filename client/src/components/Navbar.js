@@ -4,6 +4,7 @@ import '../css/Navbar.css'
 import { Nav, Navbar, NavDropdown } from 'react-bootstrap'
 import { Link } from 'react-router-dom';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
+import auth from './auth';
 
 function Menu() {
     const navDropdownTitle = (<><AccountCircleIcon /> Mi perfil</>);
@@ -30,10 +31,11 @@ function Menu() {
                     <Nav>
                         <NavDropdown title={navDropdownTitle} id="collasible-nav-dropdown" style={{ paddingRight: 60 }}>
                             <NavDropdown.Item><Link to='/CambiarContraseña' className='nav-links'>Cambiar Contraseña</Link></NavDropdown.Item>
+                           
                             <NavDropdown.Item><Link to='/CrearTrabajador' className='nav-links'>Añadir Trabajador</Link></NavDropdown.Item>
                             <NavDropdown.Item><Link to='/CrearSede' className='nav-links'>Crear sede</Link></NavDropdown.Item>
                             <NavDropdown.Divider />
-                            <NavDropdown.Item><Link to='/' className='nav-links'>Log out</Link></NavDropdown.Item>
+                            <NavDropdown.Item><Link to='/LogOut' className='nav-links'>Log out</Link></NavDropdown.Item>
                         </NavDropdown>
                     </Nav>
                 </Navbar.Collapse>

@@ -10,6 +10,7 @@ import ExtranjeriaForm from './ExtranjeriaForm';
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import Menu from '../Navbar'
+import auth from '../auth';
 import history from '../../history';
 
 const useStyles = makeStyles((theme) => ({
@@ -24,6 +25,11 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function VerCaso({ casoId }) {
+    useEffect(() => {
+		if(!auth.isAuthenticated()) {
+			history.push('/LogIn')
+		}
+	}, []);
     const classes = useStyles();
 
     const [caso, setCaso] = useState([]);

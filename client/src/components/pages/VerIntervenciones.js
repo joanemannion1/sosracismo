@@ -7,9 +7,17 @@ import download from 'downloadjs'
 import IconButton from '@material-ui/core/IconButton';
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
+
+import auth from '../auth';
+import history from '../../history';
 require("downloadjs")
 
 export default function VerIntervenciones({ casoId }) {
+    useEffect(() => {
+		if(!auth.isAuthenticated()) {
+			history.push('/LogIn')
+		}
+	}, []);
     const [AllIntervenciones, setAllIntervenciones] = useState([]);
 
     const MySwal = withReactContent(Swal)

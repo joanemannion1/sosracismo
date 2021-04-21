@@ -2,8 +2,11 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
 import Menu from '../Navbar'
+import auth from '../auth';
+import history from '../../history';
 
 export default function CambiarContrasena() {
+    
     const {register, errors, handleSubmit} = useForm();
 
     const onSubmit = (data, e) => {
@@ -21,6 +24,7 @@ export default function CambiarContrasena() {
 
     return (
         <>
+        
         <Menu />
             <div className="jumbotron vertical-center bg-white">
                 <div className="w-25 container padding25">

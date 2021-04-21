@@ -4,8 +4,16 @@ import DiscriminacionForm from './DiscriminacionForm'
 import TrabajoraHogarForm from './TrabajadoraHogarForm'
 import ExtranjeriaForm from './ExtranjeriaForm'
 import Menu from '../Navbar'
-
+import auth from '../auth';
+import history from '../../history';
 export default function AñadirCaso({user}) {
+    useEffect(() => {
+		if(!auth.isAuthenticated()) {
+			history.push('/LogIn')
+		}
+	}, []);
+
+
     const [showTrabajador, setShowTrabajador] = useState(false);
     const [showDiscriminacion, setShowDiscriminacion] = useState(false);
     const [showExtranjeria, setShowExtranjeria] = useState(false);

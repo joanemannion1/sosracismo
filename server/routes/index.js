@@ -11,6 +11,7 @@ const config = require("../config/auth.config.js");
 
 const verifyJWT = (req,res,next) => {
     const token = req.headers['x-access-token']
+    // const token = req.params.token
     if (token === 'null') {
         res.status(400).send({auth: false, message: "El token es nulo"})
     } else {
@@ -38,7 +39,7 @@ router.delete("/trabajadores/deleteAll", trabajador.deleteAllTrabajadores);
 //Log in trabajador
 router.post("/trabajador/login", trabajador.logIn);
 //Log in trabajador
-router.get("/authenticate/trabajador", verifyJWT);
+router.get("/authenticate/trabajador/", verifyJWT);
 // Create New sede
 router.post("/sede/create", sede.create);
 // // Retrieve all sedes

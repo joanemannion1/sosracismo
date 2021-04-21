@@ -17,6 +17,8 @@ import GroupIcon from '@material-ui/icons/Group';
 import Collapse from '@material-ui/core/Collapse';
 import Menu from '../Navbar'
 import { createFilterOptions } from '@material-ui/lab/Autocomplete';
+import auth from '../auth';
+import history from '../../history';
 
 const drawerWidth = 300;
 
@@ -50,6 +52,12 @@ require('moment/locale/es.js')
 const MySwal = withReactContent(Swal)
 
 export default function Citas() {
+    useEffect(() => {
+		if(!auth.isAuthenticated()) {
+			history.push('/LogIn')
+		}
+	}, []);
+    
     const classesDrawer = useStylesDrawer();
     const [citas, setCitas] = useState([]);
     const [filteredCitas, setFilteredCitas] = useState([]);

@@ -3,14 +3,22 @@ import { useForm } from 'react-hook-form';
 import axios from 'axios';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
-import history from '../../history';
 import Button from '@material-ui/core/Button';
+import auth from '../auth';
+import history from '../../history';
 
 function Alert(props) {
 	return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
 
 export default function DiscriminacionForm({ usuario, caso }) {
+    useEffect(() => {
+		if(!auth.isAuthenticated()) {
+			history.push('/LogIn')
+		}
+	}, []);
+    
+    
     const isAddMode = !caso;
 
     const { register, errors, handleSubmit, setValue, getValues } = useForm();

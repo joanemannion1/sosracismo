@@ -120,7 +120,7 @@ exports.logIn = (request, result) => {
       }
 
       var token = jwt.sign({ email: user.email, admin: user.admin }, config.secret, {
-        expiresIn:  300, //5minutu probazeko//86400 // 24 hours
+        expiresIn:  86400, //5minutu probazeko//86400 // 24 hours
       });
 
       result.json({auth: true, accessToken: token, result: {nombre: user.nombre, sede: user.sede, admin: user.admin, email:user.email}})

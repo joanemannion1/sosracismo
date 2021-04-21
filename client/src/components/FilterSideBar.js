@@ -12,6 +12,7 @@ import Collapse from '@material-ui/core/Collapse';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import Navbar from './Navbar'
+import auth from './auth';
 import history from '../history';
 import { nacionalidadList } from './NacionalidadList'
 
@@ -41,6 +42,12 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function FilterSideBar() {
+    useEffect(() => {
+		if(!auth.isAuthenticated()) {
+			history.push('/LogIn')
+		}
+	}, []);
+    
     const classes = useStyles();
     const [checkedNacionalidad, setCheckedNacionalidad] = useState([]);
     const [openSede, setOpenSede] = React.useState(false)

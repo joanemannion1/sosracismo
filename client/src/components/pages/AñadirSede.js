@@ -6,13 +6,21 @@ import * as emailjs from 'emailjs-com'
 import Menu from '../Navbar'
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
-
+import auth from '../auth';
+import history from '../../history';
 function Alert(props) {
 	return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
 
 
 export default function CrearSede() {
+    useEffect(() => {
+		if(!auth.isAuthenticated()) {
+			history.push('/LogIn')
+		}
+	}, []);
+
+    
     const {register, errors, handleSubmit} = useForm();
 
     // MUI ALERT

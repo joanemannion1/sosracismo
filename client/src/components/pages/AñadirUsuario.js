@@ -6,18 +6,19 @@ import MuiAlert from '@material-ui/lab/Alert';
 import { makeStyles } from '@material-ui/core/styles';
 import Menu from '../Navbar'
 import auth from '../auth';
+import history from '../../history';
 import { nacionalidadList } from '../NacionalidadList'
-import {Button} from 'react-bootstrap'
+import { Button } from 'react-bootstrap'
 import IconButton from '@material-ui/core/IconButton';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import CloseIcon from '@material-ui/icons/Close';
+
 function Alert(props) {
 	return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
 
 
 export default function AñadirUsuario({ usuario }) {
-	console.log(auth.getEmail())
 
 	const isAddMode = !usuario;
 
@@ -27,7 +28,14 @@ export default function AñadirUsuario({ usuario }) {
 	const [user, setUser] = useState();
 	const [nacionalidades, setNacionalidades] = useState([])
 	const [selectedNacionalidades, setSelectedNacionalidades] = useState({})
-	const [telefonoExists, setTelefonoExists]= useState(false)
+	const [telefonoExists, setTelefonoExists] = useState(false)
+
+	useEffect(() => {
+		if(!auth.isAuthenticated()) {
+			history.push('/LogIn')
+		}
+	},[]);
+
 	useEffect(() => {
 		axios.get('http://localhost:8080/sedes/all').then(res => {
 			setSedes(res.data);
@@ -54,7 +62,7 @@ export default function AñadirUsuario({ usuario }) {
 			nacionalidad: nacionalidades
 		}
 		axios.post('http://localhost:8080/usuario/create', { data }).then(res => {
-			console.log(res);
+	
 			setOpen(true);
 		});
 	}
@@ -65,7 +73,6 @@ export default function AñadirUsuario({ usuario }) {
 			nacionalidad: nacionalidades
 		}
 		axios.post('http://localhost:8080/usuario/update/{id}'.replace('{id}', usr), { data }).then(res => {
-			console.log(res);
 			setOpen(true);
 		});
 	}
@@ -80,7 +87,7 @@ export default function AñadirUsuario({ usuario }) {
 					fields.forEach(field => setValue(field, userVar[field]));
 					const nacionalidadesVar = [];
 					const data = response.data
-					data.map((user,index) => {
+					data.map((user, index) => {
 						nacionalidadesVar.push({ name: 'nacionalidad' + index, value: user.nacionalidad })
 					})
 					setNacionalidades(nacionalidadesVar)
@@ -88,7 +95,7 @@ export default function AñadirUsuario({ usuario }) {
 		} else {
 			setNacionalidades([{ name: 'nacionalidad', value: 'ES' }])
 		}
-		
+
 	}
 
 	const handleClose = (event, reason) => {
@@ -99,11 +106,11 @@ export default function AñadirUsuario({ usuario }) {
 		setOpen(false);
 	};
 
-	const comprobarTelefono = (e) =>  {
+	const comprobarTelefono = (e) => {
 		axios.get('http://localhost:8080/usuario/checkTelefono/{telefono}'.replace('{telefono}', e.target.value))
-				.then(response => {
-					setTelefonoExists(response.data.userExists)
-				})
+			.then(response => {
+				setTelefonoExists(response.data.userExists)
+			})
 	}
 
 	const selectNacionalidad = (index, e) => {
@@ -218,7 +225,7 @@ export default function AñadirUsuario({ usuario }) {
 								<div className="form-group col-md-4">
 									<label htmlFor="inputTelephone">Teléfono</label>
 									<input type="tel" className="form-control" id="inputTelephone" name="telefono" placeholder='666111222' ref={register} onBlur={(e) => comprobarTelefono(e)} />
-									{(telefonoExists && isAddMode) ? <span style={{color: 'red'}}>El telefono introducido ya existe</span> : null}
+									{(telefonoExists && isAddMode) ? <span style={{ color: 'red' }}>El telefono introducido ya existe</span> : null}
 								</div>
 							</div>
 						</div>
@@ -319,28 +326,27 @@ export default function AñadirUsuario({ usuario }) {
 									<label>Nacionalidad</label>
 									{
 										nacionalidades.map((n, index) => {
-											console.log(n)
 											return (
 												<>
-												<div className="form-row">
+													<div className="form-row">
 
-												
-													
-													<select defaultValue={n.value} className="form-control col-md-10" key={index} name={n.name + index} onChange={(e) => selectNacionalidad(index, e)}>
-														<option>OTRO</option>
-														{
-															nacionalidadList.map((nacionalidad, id) => {
-																return (<option key={id} value={nacionalidad.value}>{nacionalidad.label}</option>)
-															})
-														}
-													</select>
-													<IconButton onClick={() => eliminarInputNacionalidad(index)} size="small" color="secondary" className="col-md-2">
-														<CloseIcon fontSize="inherit" className="danger"/> 
-													</IconButton>
-												
+
+
+														<select defaultValue={n.value} className="form-control col-md-10" key={index} name={n.name + index} onChange={(e) => selectNacionalidad(index, e)}>
+															<option>OTRO</option>
+															{
+																nacionalidadList.map((nacionalidad, id) => {
+																	return (<option key={id} value={nacionalidad.value}>{nacionalidad.label}</option>)
+																})
+															}
+														</select>
+														<IconButton onClick={() => eliminarInputNacionalidad(index)} size="small" color="secondary" className="col-md-2">
+															<CloseIcon fontSize="inherit" className="danger" />
+														</IconButton>
+
 													</div>
-													
-													
+
+
 													<br />
 												</>
 											)

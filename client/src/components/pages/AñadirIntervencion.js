@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
 import Menu from '../Navbar'
 import { useDropzone } from 'react-dropzone';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
-
+import auth from '../auth';
+import history from '../../history';
 function Alert(props) {
 	return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
@@ -27,6 +28,13 @@ const baseStyle = {
 };
 
 export default function AñadirIntervencion({ usuario, caso }) {
+    useEffect(() => {
+		if(!auth.isAuthenticated()) {
+			history.push('/LogIn')
+		}
+	}, []);
+
+    
     const { register, errors, handleSubmit } = useForm();
 
     const { acceptedFiles, getRootProps, getInputProps } = useDropzone();
