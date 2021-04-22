@@ -52,7 +52,12 @@ exports.createDoc = (req, res) => {
                             err.message || "Ha habido algun error creando la intervención."
                     });
                 });
-        });
+        }).catch(err => {
+            res.status(500).send({
+              message:
+                err.message || "Ha habido algun error creando la intervención."
+            });
+          });
     }
 
 }
@@ -85,7 +90,12 @@ exports.getAllByCaso = (req, res) => {
     var id = req.params.casoId;
     db.databaseConf.query("SELECT Intervencion.*, Documentos.id AS docId, Documentos.nombre AS docNombre, Documentos.type AS type FROM Intervencion LEFT OUTER JOIN Documentos on Intervencion.id = Documentos.intervencionId WHERE casoId = " + id).then(results => {
         res.send(results[0])
-    });
+    }).catch(err => {
+        res.status(500).send({
+          message:
+            err.message || "Ha habido algun error obteniendo las intervenciones."
+        });
+      });
 };
 
 //Delete intervención by Id
@@ -96,32 +106,32 @@ exports.deleteById = (req, result) => {
             id: id
         }
     }).then(num => {
-            if (num === 1) {
-                Documento.destroy({
-                    where: { intervencion: id }
-                  }).then(num => {
-                    if (num === 1) {
-                      result.send({
+        if (num === 1) {
+            Documento.destroy({
+                where: { intervencion: id }
+            }).then(num => {
+                if (num === 1) {
+                    result.send({
                         message: "La intervención ha sido eliminado correctamente."
-                      });
-                    } else {
-                      result.send({
+                    });
+                } else {
+                    result.send({
                         message: `No se ha podido eliminar la intervención con id=${id}!`
-                      });
-                    }
-                })
-                result.send({
-                    message: "La intervención ha sido eliminado correctamente."
-                  });
-            } else {
-              result.send({
+                    });
+                }
+            })
+            result.send({
+                message: "La intervención ha sido eliminado correctamente."
+            });
+        } else {
+            result.send({
                 message: `No se ha podido eliminar la intervención con id=${id}!`
-              });
-            }
+            });
+        }
     }).catch(err => {
-      result.status(500).send({
-        message: err.message || `Ha habido algun error eliminando la intervención con id=${id}!`
-      });
+        result.status(500).send({
+            message: err.message || `Ha habido algun error eliminando la intervención con id=${id}!`
+        });
     });
 }
 

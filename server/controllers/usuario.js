@@ -121,6 +121,11 @@ exports.getAllSedes = (req, result) => {
 exports.getCountUserByNationalities = (req, res) => {
   db.databaseConf.query("SELECT Nacionalidad.nacionalidad, SUM(CASE WHEN Usuario.genero = 'h' THEN 1 END) AS hombre ,SUM(CASE WHEN Usuario.genero = 'm' THEN 1 END) AS mujer FROM Usuario LEFT OUTER JOIN Nacionalidad ON Usuario.n_documentacion = Nacionalidad.n_documentacion WHERE Nacionalidad.nacionalidad IS NOT NULL GROUP BY Nacionalidad.nacionalidad").then(results => {
     res.send(results[0])
+  }).catch(err => {
+    res.status(500).send({
+      message:
+        err.message || "Ha habido algun error contando los usuarios por nacionalidades."
+    });
   });
 }
 
@@ -128,6 +133,11 @@ exports.getCountUserByNationalities = (req, res) => {
 exports.getCountUserByNecesidad = (req, res) => {
   db.databaseConf.query("SELECT NecesidadExtranjeria.necesidad, SUM(CASE WHEN Usuario.genero = 'h' THEN 1 END) AS hombre ,SUM(CASE WHEN Usuario.genero = 'm' THEN 1 END) AS mujer FROM NecesidadExtranjeria LEFT OUTER JOIN Caso on NecesidadExtranjeria.id = Caso.id Left Outer Join Usuario ON Caso.n_documentacion = Usuario.n_documentacion GROUP BY NecesidadExtranjeria.necesidad").then(results => {
     res.send(results[0])
+  }).catch(err => {
+    res.status(500).send({
+      message:
+        err.message || "Ha habido algun error contando usuarios por necesidad."
+    });
   });
 }
 

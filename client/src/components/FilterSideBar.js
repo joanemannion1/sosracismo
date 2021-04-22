@@ -99,7 +99,9 @@ export default function FilterSideBar() {
                 data.map((val) => { newArray.push(val.nacionalidad); });
                 console.log(newArray)
                 setCheckedNacionalidad(newArray)
-            });
+            }).catch(error => {
+                console.log("Ha habido un error obteniendo los datos")
+            })
     }
 
     const getSede = async () => {
@@ -111,7 +113,9 @@ export default function FilterSideBar() {
                     newArray.push(val.sede);
                 });
                 setCheckedSede(newArray)
-            });
+            }).catch(error => {
+                console.log("Ha habido un error obteniendo los datos")
+            })
     }
 
     const getSedesAll = async () => {
@@ -119,7 +123,9 @@ export default function FilterSideBar() {
             .then(response => response.json())
             .then(data => {
                 setSede(data)
-            });
+            }).catch(error => {
+                console.log("Ha habido un error obteniendo los datos")
+            })
     }
 
     const filterDate = (e) => {

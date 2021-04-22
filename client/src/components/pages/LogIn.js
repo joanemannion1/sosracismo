@@ -8,6 +8,7 @@ import auth from '../auth'
 export default function LogIn() {
 
     const { register, errors, handleSubmit } = useForm();
+    const [error, setError] = useState(false)
 
     const onSubmit = (data, e) => {
         axios.post('http://localhost:8080/trabajador/login', {
@@ -20,9 +21,9 @@ export default function LogIn() {
             auth.login(() => {
               history.push('/');
             })
-            // window.location.reload();
+        }).catch(error => {
+            setError(true)
         })
-
 
         // limpiar campos
         e.target.reset();
@@ -62,6 +63,8 @@ export default function LogIn() {
 
                         <button type="submit" className="btn btn-lg btn-primary btn-block" name="submitButton">Iniciar</button>
                        
+                       <br/>
+                        {error ? <h6>Usuario o contraseña incorrecto. </h6> : null}
                     </form>
                 </div>
             </div>

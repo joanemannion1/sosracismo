@@ -22,7 +22,9 @@ export default function VerCasosNoFinalizados() {
             .then(response => response.json())
             .then(data => {
                 setAllCasos(data);
-            });
+            }).catch(error => {
+                console.log("Ha habido un error obteniendo los datos")
+            })
     }
 
     const goToVerCaso = (index) => {

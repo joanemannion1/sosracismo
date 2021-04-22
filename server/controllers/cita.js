@@ -54,6 +54,11 @@ exports.create = (req, res) => {
 exports.getAllCitas = (req, result) => {
     db.databaseConf.query("SELECT CUT.id,CUT.trabajadorId,CUT.n_documentacion,Cita.fechaInicio AS start, Cita.fechaFin AS end, Cita.nombre as title, Cita.notas, Trabajador.color FROM Cita_Usuario_Trabajador as CUT INNER JOIN Cita on CUT.id = Cita.id INNER JOIN Trabajador On CUT.trabajadorId = Trabajador.email").then(results => {
         result.send(results)
+    }).catch(err => {
+      res.status(500).send({
+        message:
+          err.message || "Ha habido algun error obteniendo la cita."
+      });
     });
 };
 

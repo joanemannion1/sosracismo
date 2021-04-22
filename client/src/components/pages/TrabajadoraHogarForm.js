@@ -93,7 +93,9 @@ export default function TrabajadoraHogarForm({ usuario , caso }) {
                     setValue('seguridad_social', casoVar['seguridad_social'] === 0? 'false' : 'true')
                     setValue('solo_fines_semana', casoVar['solo_fines_semana'] === 0? 'false' : 'true')
                     setValue('regularizada', casoVar['regularizada'] === 0? 'false' : 'true')
-                });
+                }).catch(error => {
+                    console.log("Ha habido un error obteniendo los datos")
+                })
         }
     }
 

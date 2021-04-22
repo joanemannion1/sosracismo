@@ -30,14 +30,18 @@ export default function ExportExcel() {
             .then(data => {
                 console.log(data)
                 setNacionalidad(data);
-            });
+            }).catch(error => {
+                console.log("Ha habido un error obteniendo los datos")
+            })
     }
 
     const getNecesidad = async () => {
         axios.post('http://localhost:8080/necesidadUsuario/', { startDate: startDate, endDate: endDate })
             .then(response => {
                 setNecesidad(response.data);
-            });
+            }).catch(error => {
+                console.log("Ha habido un error obteniendo los datos")
+            })
     }
 
     const filterDate = (e) => {

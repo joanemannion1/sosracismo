@@ -92,7 +92,9 @@ export default function DiscriminacionForm({ usuario, caso }) {
                     const fields = ['Situacion_documental', 'situacion_residencial', 'estudios', 'rasgos_fenotipicos', 'tipo', 'conflicto', 'denegacion_privada', 'denegacion_publica', 'racismo', 'agente_discriminador', 'relato_hechos', 'municipio', 'identificacion', 'testigos', 'otros', 'estrategia', 'asumir', 'derivar']
                     fields.forEach(field => setValue(field, casoVar[field]));
                     setValue('fecha', casoVar['fecha'].substring(0, 10))
-                });
+                }).catch(error => {
+                    console.log("Ha habido un error obteniendo los datos")
+                })
         }
     }
 

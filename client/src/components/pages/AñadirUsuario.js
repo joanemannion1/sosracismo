@@ -3,12 +3,10 @@ import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
-import { makeStyles } from '@material-ui/core/styles';
 import Menu from '../Navbar'
 import auth from '../auth';
 import history from '../../history';
 import { nacionalidadList } from '../NacionalidadList'
-import { Button } from 'react-bootstrap'
 import IconButton from '@material-ui/core/IconButton';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import CloseIcon from '@material-ui/icons/Close';
@@ -24,10 +22,10 @@ export default function AñadirUsuario({ usuario }) {
 
 	const { register, errors, handleSubmit, setValue } = useForm();
 	const [open, setOpen] = useState()
+	const [error, setError] = useState()
 	const [sedes, setSedes] = useState([]);
 	const [user, setUser] = useState();
 	const [nacionalidades, setNacionalidades] = useState([])
-	const [selectedNacionalidades, setSelectedNacionalidades] = useState({})
 	const [telefonoExists, setTelefonoExists] = useState(false)
 
 	useEffect(() => {
@@ -39,9 +37,8 @@ export default function AñadirUsuario({ usuario }) {
 	useEffect(() => {
 		axios.get('http://localhost:8080/sedes/all').then(res => {
 			setSedes(res.data);
-		})
-			.catch(err => {
-				console.log(err);
+		}).catch(err => {
+				console.log('Ha habido un problema cargando las sedes')
 			})
 	}, []);
 
@@ -62,9 +59,10 @@ export default function AñadirUsuario({ usuario }) {
 			nacionalidad: nacionalidades
 		}
 		axios.post('http://localhost:8080/usuario/create', { data }).then(res => {
-	
 			setOpen(true);
-		});
+		}).catch(error => {
+			setError(true)
+		})
 	}
 
 	const updateUser = (usr, data) => {
@@ -74,7 +72,9 @@ export default function AñadirUsuario({ usuario }) {
 		}
 		axios.post('http://localhost:8080/usuario/update/{id}'.replace('{id}', usr), { data }).then(res => {
 			setOpen(true);
-		});
+		}).catch(error => {
+			setError(true)
+		})
 	}
 
 	const getUser = () => {
@@ -102,7 +102,7 @@ export default function AñadirUsuario({ usuario }) {
 		if (reason === 'clickaway') {
 			return;
 		}
-
+		setError(false)
 		setOpen(false);
 	};
 
@@ -182,7 +182,16 @@ export default function AñadirUsuario({ usuario }) {
 								</div>
 								<div className="form-group col-md-4">
 									<label htmlFor="inputDocumentation">Nº Documentación</label>
-									<input type="text" className="form-control" id="inputDocumentation" name="n_documentacion" placeholder='11223344J' ref={register} />
+									<input type="text" className="form-control" id="inputDocumentation" name="n_documentacion" placeholder='11223344J' required autoFocus
+										ref={register({
+											required: {
+												value: true,
+												message: 'Número de documentación es requerido'
+											}
+										})} />
+									<span className="text-danger text-small d-block mb-2">
+										{errors.n_documentacion && errors.n_documentacion.message}
+									</span> 
 								</div>
 								<div className="form-group col-md-4">
 									<label htmlFor="inputGender">Género</label>
@@ -366,6 +375,12 @@ export default function AñadirUsuario({ usuario }) {
 					<Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
 						<Alert onClose={handleClose} severity="success">
 							El usuario ha sido {isAddMode ? 'añadido' : 'actualizado'} correctamente!
+        				</Alert>
+					</Snackbar>
+
+					<Snackbar open={error} autoHideDuration={6000} onClose={handleClose}>
+						<Alert onClose={handleClose} severity="error">
+							Ha habido algun error {isAddMode ? 'añadiendo' : 'actualizando'} el usuario!
         				</Alert>
 					</Snackbar>
 					<div className="modal" tabIndex="-1" role="dialog" id="confirmationModal">

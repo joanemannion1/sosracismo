@@ -127,7 +127,9 @@ export default function VerUsuario(filters) {
                 setUsuarios(filteredUsers)
                 setUsuariosDefault(filteredUsers)
                 setAllCasos(data);
-            });
+            }).catch(error => {
+                console.log("Ha habido un error obteniendo los datos")
+            })
     }
 
     const getCasos = async () => {
@@ -135,7 +137,9 @@ export default function VerUsuario(filters) {
             .then(response => response.json())
             .then(data => {
                 setAllCasos(data);
-            });
+            }).catch(error => {
+                console.log("Ha habido un error obteniendo los datos")
+            })
     }
 
     const updateInput = async (input) => {

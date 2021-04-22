@@ -41,7 +41,9 @@ export default function VerCaso({ casoId }) {
         axios.get('http://localhost:8080/caso/{id}'.replace('{id}', casoId))
             .then(response => {
                 setCaso(response.data[0])
-            });
+            }).catch(error => {
+                console.log("Ha habido un error obteniendo los datos")
+            })
     }
 
     const finalizarCaso = () => {
@@ -135,7 +137,9 @@ export default function VerCaso({ casoId }) {
             .then(response => {
                 console.log(response.data[0])
                 setCasoType(response.data[0].tablename)
-            });
+            }).catch(error => {
+                console.log("Ha habido un error obteniendo los datos")
+            })
     }
 
     const goToVerIntervencion = () => {

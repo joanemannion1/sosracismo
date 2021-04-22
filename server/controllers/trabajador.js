@@ -6,42 +6,48 @@ const bcrypt = require('bcrypt');
 const BCRYPT_SALT_ROUNDS = 12;
 const jwt = require("jsonwebtoken");
 const config = require("../config/auth.config.js");
+const trabajadorahogar = require("../models/trabajadorahogar");
 
 // Create and Save a new Trabajador
 exports.create = (req, res) => {
-    // Validate request
-    if (!req.body.data) {
-        res.status(400).send({
-        message: "Contenido no puede estar vacio!"
-        });
-        return;
-    }
-    // Create a Trabajador
-    const trabajador = {
+  // Validate request
+  if (!req.body.data) {
+    res.status(400).send({
+      message: "Contenido no puede estar vacio!"
+    });
+    return;
+  }
+  // Create a Trabajador
+  bcrypt
+    .hash(req.body.data.contraseña, BCRYPT_SALT_ROUNDS)
+    .then(hashedPassword => {
+      const trabajador = {
         nombre: req.body.data.nombre,
         email: req.body.data.email,
-        contraseña: req.body.data.contraseña,
+        contraseña: hashedPassword,
         admin: req.body.data.admin ? 1 : 0,
         sedeId: req.body.data.sede,
         color: req.body.data.color,
-    };
-    
-    // Save Trabajador in the database
-    Trabajador.create(trabajador)
-        .then(data => {
-        res.send(data);
-        })
-        .catch(err => {
-        res.status(500).send({
-            message:
-            err.message || "Ha habido algun error creando el usuario."
-        });
-        });
+      };
+    })
+
+
+  // Save Trabajador in the database
+  Trabajador.create(trabajador)
+    .then(data => {
+      res.send(data);
+    })
+    .catch(err => {
+      res.status(500).send({
+        message:
+          err.message || "Ha habido algun error creando el usuario."
+      });
+    });
 };
 
 // Retrieve all Trabajadores from the database.
 exports.getAllTrabajadores = (_, result) => {
-    Trabajador.findAll()
+  Trabajador.findAll()
     .then(data => {
       result.send(data);
     }).catch(err => {
@@ -53,47 +59,56 @@ exports.getAllTrabajadores = (_, result) => {
 
 // Find a single Trabajador with an id
 exports.getTrabajadorByEmail = (request, result) => {
-    const paramEmail = request.params.email;
-    Trabajador.findAll({
-      where: { email: paramEmail }
-    }).then(data => {
-      result.send(data);
-    }).catch(err => {
-      result.status(500).send({
-        message: err.message || `Ha habido algun error consiguiendo el trabajador con email : ${paramEmail}`
-      });
+  const paramEmail = request.params.email;
+  Trabajador.findAll({
+    where: { email: paramEmail }
+  }).then(data => {
+    result.send(data);
+  }).catch(err => {
+    result.status(500).send({
+      message: err.message || `Ha habido algun error consiguiendo el trabajador con email : ${paramEmail}`
     });
-  };
+  });
+};
 
-exports.updatePasswordByEmail = (request, result) =>  {
+exports.updatePasswordByEmail = (request, result) => {
   Trabajador.findOne({
     where: {
       email: request.body.email,
-      contraseña: request.body.contraseña_actual,
     },
   }).then(trabajador => {
+    console.log(trabajador)
     if (trabajador == null) {
-      console.error('trabajador no existe en la base de datos');
-      result.status(403).send('trabajador no existe en la base de datos');
+      result.status(403).send('Trabajador no existe en la base de datos');
     } else if (trabajador != null) {
-        bcrypt
-          .hash(request.body.contraseña, BCRYPT_SALT_ROUNDS)
-          .then(hashedPassword => {
-            trabajador.update({
-              contraseña: hashedPassword,
-            });
-          })
-          .then(() => {
-            console.log('contraseña actualizada');
-            result.status(200).send({ message: 'contraseña actualizada' });
+      var passwordIsValid = bcrypt.compareSync(
+        request.body.contraseña_actual,
+        trabajador.contraseña
+      );
+
+      if (!passwordIsValid) {
+        return result.status(401).send({
+          accessToken: null,
+          message: "La contraseña actual es incorrecta"
+        });
+      }
+
+      bcrypt
+        .hash(request.body.contraseña, BCRYPT_SALT_ROUNDS)
+        .then(hashedPassword => {
+          trabajador.update({
+            contraseña: hashedPassword,
           });
-        
+        })
+        .then(() => {
+          result.status(200).send({ message: 'contraseña actualizada' });
+        });
+
     } else {
-      console.error('no trabajador exists in db to update');
       result.status(401).json('no trabajador exists in db to update');
     }
   });
-} 
+}
 
 
 // Hacer Log In de un trabajador
@@ -103,73 +118,73 @@ exports.logIn = (request, result) => {
       email: request.body.email,
     }
   }).then(user => {
-      if (!user) {
-        return result.status(404).send({ message: "User Not found." });
-      }
+    if (!user) {
+      return result.status(404).send({ message: "User Not found." });
+    }
 
-      var passwordIsValid = bcrypt.compareSync(
-        request.body.contraseña,
-        user.contraseña
-      );
+    var passwordIsValid = bcrypt.compareSync(
+      request.body.contraseña,
+      user.contraseña
+    );
 
-      if (!passwordIsValid) {
-        return result.status(401).send({
-          accessToken: null,
-          message: "Invalid Password!"
-        });
-      }
-
-      var token = jwt.sign({ email: user.email, admin: user.admin }, config.secret, {
-        expiresIn:  86400, //5minutu probazeko//86400 // 24 hours
+    if (!passwordIsValid) {
+      return result.status(401).send({
+        accessToken: null,
+        message: "Invalid Password!"
       });
+    }
 
-      result.json({auth: true, accessToken: token, result: {nombre: user.nombre, sede: user.sede, admin: user.admin, email:user.email}})
-      // result.status(200).send({
-      //   nombre: user.nombre,
-      //   sede: user.sedeId,
-      //   admin: user.admin,
-      //   accessToken: token
-      // });
-    }).catch(err => {
-      result.status(500).send({ message: err.message });
+    var token = jwt.sign({ email: user.email, admin: user.admin }, config.secret, {
+      expiresIn: 86400, //5minutu probazeko//86400 // 24 hours
     });
+
+    result.json({ auth: true, accessToken: token, result: { nombre: user.nombre, sede: user.sede, admin: user.admin, email: user.email } })
+    // result.status(200).send({
+    //   nombre: user.nombre,
+    //   sede: user.sedeId,
+    //   admin: user.admin,
+    //   accessToken: token
+    // });
+  }).catch(err => {
+    result.status(500).send({ message: err.message });
+  });
 }
 
 // Delete a Trabajador with the specified id in the request
 exports.deleteTrabajadorByEmail = (request, result) => {
-    const paramEmail = request.params.email;
-    Trabajador.destroy({
-      where: { email: paramEmail }
-    }).then(num => {
-      if (num === 1) {
-        result.send({
-          message: "El trabajador ha sido eliminado correctamente."
-        });
-      } else {
-        result.send({
-          message: `No se ha podido eliminar trabajador con email=${paramEmail}!`
-        });
-      }
-    }).catch(err => {
-      result.status(500).send({
-        message: err.message || `Ha habido algun error eliminando trabajador con email=${paramEmail}!`
+  const paramEmail = request.params.email;
+  Trabajador.destroy({
+    where: { email: paramEmail }
+  }).then(num => {
+    if (num === 1) {
+      result.send({
+        message: "El trabajador ha sido eliminado correctamente."
       });
+    } else {
+      result.send({
+        message: `No se ha podido eliminar trabajador con email=${paramEmail}!`
+      });
+    }
+  }).catch(err => {
+    result.status(500).send({
+      message: err.message || `Ha habido algun error eliminando trabajador con email=${paramEmail}!`
     });
-  };
+  });
+};
 
 // Delete all Trabajadores from the database.
 exports.deleteAllTrabajadores = (request, result) => {
-    Trabajador.destroy({
-      where: {},
-      truncate: false
-    }).then(nums => {
-      result.send({
-        message: `${nums} trabajadores han sido eliminados correctamente!`
-      });
-    }).catch(err => {
-      result.status(500).send({
-        message: err.message || "Ha habido algun error, no se han podido eliminar trabajadores}!"
-      });
+  Trabajador.destroy({
+    where: {},
+    truncate: false
+  }).then(nums => {
+    result.send({
+      message: `${nums} trabajadores han sido eliminados correctamente!`
     });
-  };
-  
+  }).catch(err => {
+    result.status(500).send({
+      message: err.message || "Ha habido algun error, no se han podido eliminar trabajadores}!"
+    });
+  });
+};
+

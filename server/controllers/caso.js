@@ -15,12 +15,12 @@ const config = require("../config/auth.config.js");
 // Create and Save a new Caso Discriminacion
 exports.createDiscriminacion = (req, res) => {
   // Validate request
-  // if (!req.body.formData.fechaInicio) {
-  //     res.status(400).send({
-  //         message: "Contenido no puede estar vacio!"
-  //     });
-  //     return;
-  // }
+  if (!req.body.data.n_documentacion) {
+    res.status(400).send({
+      message: "Contenido no puede estar vacio!"
+    });
+    return;
+  }
 
   const caso = {
     n_documentacion: req.body.data.n_documentacion,
@@ -74,8 +74,15 @@ exports.createDiscriminacion = (req, res) => {
 
 // Update and Save a Caso Discriminacion
 exports.updateDiscriminacion = (req, res) => {
-  const id = req.params.id;
+  // Validate request
+  if (!req.params.id) {
+    res.status(400).send({
+      message: "Contenido no puede estar vacio!"
+    });
+    return;
+  }
 
+  const id = req.params.id;
   const discriminacionVar = {
     Situacion_documental: req.body.data.Situacion_documental,
     situacion_residencial: req.body.data.situacion_residencial,
@@ -106,7 +113,7 @@ exports.updateDiscriminacion = (req, res) => {
         message: "Caso was updated successfully."
       });
     } else {
-      res.send({
+      res.status(500).send({
         message: `Cannot update Caso with id=${id}. Maybe User was not found or req.body is empty!`
       });
     }
@@ -122,12 +129,12 @@ exports.updateDiscriminacion = (req, res) => {
 // Create and Save a new Caso Trabajadora Hogar
 exports.createTrabajadoraHogar = (req, res) => {
   // Validate request
-  // if (!req.body.formData.fechaInicio) {
-  //     res.status(400).send({
-  //         message: "Contenido no puede estar vacio!"
-  //     });
-  //     return;
-  // }
+  if (!req.body.data.n_documentacion) {
+    res.status(400).send({
+      message: "Contenido no puede estar vacio!"
+    });
+    return;
+  }
 
   const caso = {
     n_documentacion: req.body.data.n_documentacion,
@@ -258,18 +265,23 @@ exports.updateTrabajadoraHogar = (req, res) => {
         message: `Cannot update Caso with id=${id}. Maybe User was not found or req.body is empty!`
       });
     }
-  })
-    .catch(err => {
-      res.status(500).send({
-        message: "Error updating Caso with id=" + id
-      });
+  }).catch(err => {
+    res.status(500).send({
+      message: "Error updating Caso with id=" + id
     });
+  });
 
 };
 
 // Create and Save a new Caso Extranjeria
 exports.createExtranjeria = (req, res) => {
-
+  // Validate request
+  if (!req.body.data.n_documentacion) {
+    res.status(400).send({
+      message: "Contenido no puede estar vacio!"
+    });
+    return;
+  }
   const caso = {
     n_documentacion: req.body.data.n_documentacion,
     trabajadorId: req.body.data.trabajadorId,
@@ -300,7 +312,12 @@ exports.createExtranjeria = (req, res) => {
 
       })
       res.send({ message: " El caso ha sido añadido correctamente", caso: data.id })
-    })
+    }).catch(err => {
+      res.status(500).send({
+        message:
+          err.message || "Ha habido algun error creando el caso."
+      });
+    });
 };
 
 // Update and Save a Caso Extranjeria
@@ -385,8 +402,7 @@ exports.getCasoById = (req, result) => {
     where: {
       id: id
     },
-  })
-    .then(data => {
+  }).then(data => {
       result.send(data);
     }).catch(error => {
       result.status(400).send(error)
@@ -400,8 +416,7 @@ exports.getCasoEspecificoDiscriminacionId = (req, result) => {
     where: {
       id: id
     },
-  })
-    .then(data => {
+  }).then(data => {
       result.send(data);
     }).catch(error => {
       result.status(400).send(error)
@@ -412,6 +427,11 @@ exports.getCasoEspecificoTrabajadoraId = (req, result) => {
   const id = req.params.id;
   db.databaseConf.query("SELECT * FROM TrabajadoraHogar LEFT JOIN Interna On TrabajadoraHogar.id = Interna.id WHERE TrabajadoraHogar.id = " + id).then(results => {
     result.send(results[0])
+  }).catch(err => {
+    res.status(500).send({
+      message:
+        err.message || "Ha habido algun error obteniendo el caso."
+    });
   });
 };
 
@@ -419,6 +439,11 @@ exports.getCasoEspecificoExtranjeriaId = (req, result) => {
   const id = req.params.id;
   db.databaseConf.query("SELECT * FROM Extranjeria WHERE Extranjeria.id = " + id).then(results => {
     result.send(results[0])
+  }).catch(err => {
+    res.status(500).send({
+      message:
+        err.message || "Ha habido algun error obteniendo el caso."
+    });
   });
 };
 
@@ -457,6 +482,11 @@ exports.getCasoType = (req, result) => {
   const id = req.params.id;
   db.databaseConf.query("SELECT id,tablename FROM (SELECT id, 'Extranjeria' AS tablename FROM Extranjeria WHERE id = " + id + " UNION ALL SELECT id, 'TrabajadoraHogar' as tablename From TrabajadoraHogar WHERE id = " + id + " UNION ALL Select id, 'Discriminacion' as tablename FROM Discriminacion WHERE id = " + id + ") AS X").then(results => {
     result.send(results[0])
+  }).catch(err => {
+    res.status(500).send({
+      message:
+        err.message || "Ha habido algun error creando el caso."
+    });
   });
 }
 
@@ -566,5 +596,10 @@ exports.getNecesidadWithUser = (req, res) => {
   end = req.body.endDate
   db.databaseConf.query("SELECT NecesidadExtranjeria.necesidad, SUM(CASE WHEN Usuario.genero = 'h' THEN 1 END) AS hombre ,SUM(CASE WHEN Usuario.genero = 'm' THEN 1 END) AS mujer FROM NecesidadExtranjeria LEFT OUTER JOIN Caso on NecesidadExtranjeria.id = Caso.id Left Outer Join Usuario ON Caso.n_documentacion = Usuario.n_documentacion  WHERE NecesidadExtranjeria.updatedAt <= '" + end + "' AND NecesidadExtranjeria.updatedAt >= '" + start + "' GROUP BY NecesidadExtranjeria.necesidad").then(results => {
     res.send(results[0])
+  }).catch(err => {
+    res.status(500).send({
+      message:
+        err.message || "Ha habido algun error descargando la necesidad."
+    });
   });
 }

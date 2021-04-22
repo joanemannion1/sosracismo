@@ -130,7 +130,9 @@ export default function ExtranjeriaForm({ usuario, caso }) {
                 .then(response => {
                     const casoVar = response.data[0]
                     setSelectedProyecto(casoVar['proyectos'])
-                });
+                }).catch(error => {
+                    console.log("Ha habido un error obteniendo los datos")
+                })
         }
     }
 

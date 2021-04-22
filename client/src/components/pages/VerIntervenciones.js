@@ -27,7 +27,9 @@ export default function VerIntervenciones({ casoId }) {
             .then(response => response.json())
             .then(data => {
                 setAllIntervenciones(data);
-            });
+            }).catch(error => {
+                console.log("Ha habido un error obteniendo los datos")
+            })
     }
 
     const downloadFile = async (id, filename, type) => {
@@ -36,6 +38,7 @@ export default function VerIntervenciones({ casoId }) {
           }).then(res => {
             return download(res.data, filename, type)
         }).catch((error) => {
+            alert('Ha habido un error descargando el documento, lo sentimos')
         })
     }
 
