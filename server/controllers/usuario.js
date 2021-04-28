@@ -38,7 +38,6 @@ exports.create = (req, res) => {
   Usuario.create(usuario)
     .then(data => {
       req.body.data.nacionalidad.map(nacionalidad => {
-        console.log(nacionalidad)
         Nacionalidad.create({ nacionalidad: nacionalidad.value, n_documentacion: data.n_documentacion })
       })
       res.send(data);
@@ -71,7 +70,11 @@ exports.getAllUsuarios = (req, result) => {
 exports.getUsuarioWithDocumentacion = (req, result) => {
   const ndoc = req.params.ndoc;
   db.databaseConf.query("SELECT Usuario.*, Nacionalidad.nacionalidad FROM Usuario LEFT OUTER JOIN Nacionalidad on Usuario.n_documentacion = Nacionalidad.n_documentacion WHERE Usuario.n_documentacion = '" + ndoc + "'").then(results => {
-    result.send(results[0])
+    if(!(results[0][0])) {
+      result.status(500).send({message : 'Usuario no encontrado'})
+    } else {
+      result.send(results[0])
+    }
   }).catch(error => {
     result.status(400).send(error)
   })
@@ -188,7 +191,8 @@ exports.update = (req, res) => {
     })
     .catch(err => {
       res.status(500).send({
-        message: "Error updating User with id=" + id
+        message: "Error updating User with id=" + id,
+        error: err
       });
     });
 };

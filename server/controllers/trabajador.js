@@ -11,38 +11,39 @@ const trabajadorahogar = require("../models/trabajadorahogar");
 // Create and Save a new Trabajador
 exports.create = (req, res) => {
   // Validate request
-  if (!req.body.data) {
+  if (!req.body.data.email) {
     res.status(400).send({
       message: "Contenido no puede estar vacio!"
     });
     return;
   }
+
+  const trabajador = {
+    nombre: req.body.data.nombre,
+    email: req.body.data.email,
+    admin: req.body.data.admin ? 1 : 0,
+    sedeId: req.body.data.sede,
+    color: req.body.data.color,
+  };
   // Create a Trabajador
-  bcrypt
-    .hash(req.body.data.contraseña, BCRYPT_SALT_ROUNDS)
+  bcrypt.hash(req.body.data.contraseña, BCRYPT_SALT_ROUNDS)
     .then(hashedPassword => {
-      const trabajador = {
-        nombre: req.body.data.nombre,
-        email: req.body.data.email,
-        contraseña: hashedPassword,
-        admin: req.body.data.admin ? 1 : 0,
-        sedeId: req.body.data.sede,
-        color: req.body.data.color,
-      };
+      trabajador['contraseña'] = hashedPassword
+      Trabajador.create(trabajador)
+      .then(data => {
+        res.status(200).send(data);
+      })
+      .catch(err => {
+        res.status(500).send({
+          message:
+            err.message || "Ha habido algun error creando el usuario."
+        });
+      });
     })
 
 
   // Save Trabajador in the database
-  Trabajador.create(trabajador)
-    .then(data => {
-      res.send(data);
-    })
-    .catch(err => {
-      res.status(500).send({
-        message:
-          err.message || "Ha habido algun error creando el usuario."
-      });
-    });
+ 
 };
 
 // Retrieve all Trabajadores from the database.
@@ -63,7 +64,11 @@ exports.getTrabajadorByEmail = (request, result) => {
   Trabajador.findAll({
     where: { email: paramEmail }
   }).then(data => {
-    result.send(data);
+    if (!data[0].email) {
+      result.status(500).send({message: "Ese trabajador no existe"})
+    } else {
+      result.send(data);
+    }
   }).catch(err => {
     result.status(500).send({
       message: err.message || `Ha habido algun error consiguiendo el trabajador con email : ${paramEmail}`
@@ -161,7 +166,7 @@ exports.deleteTrabajadorByEmail = (request, result) => {
         message: "El trabajador ha sido eliminado correctamente."
       });
     } else {
-      result.send({
+      result.status(500).send({
         message: `No se ha podido eliminar trabajador con email=${paramEmail}!`
       });
     }

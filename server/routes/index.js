@@ -1,4 +1,4 @@
-const trabajador = require("../controllers/trabajador");
+
 const sede = require("../controllers/sede");
 const usuario = require("../controllers/usuario");
 const cita = require("../controllers/cita");
@@ -8,6 +8,7 @@ const express = require("express");
 const router = express.Router();
 const jwt = require('jsonwebtoken')
 const config = require("../config/auth.config.js");
+const trabajador = require("../controllers/trabajador");
 
 const verifyJWT = (req,res,next) => {
     const token = req.headers['x-access-token']
@@ -25,7 +26,7 @@ const verifyJWT = (req,res,next) => {
     }
 }
 // Create New trabajador
-router.post("/trabajador/create" ,trabajador.create);
+router.post("/trabajador/create" , trabajador.create);
 // // Retrieve all trabajadores
 router.get("/trabajadores/all", trabajador.getAllTrabajadores);
 // Retrieve trabajador by email
@@ -40,6 +41,7 @@ router.delete("/trabajadores/deleteAll", trabajador.deleteAllTrabajadores);
 router.post("/trabajador/login", trabajador.logIn);
 //Log in trabajador
 router.get("/authenticate/trabajador/", verifyJWT);
+
 // Create New sede
 router.post("/sede/create", sede.create);
 // // Retrieve all sedes
@@ -59,9 +61,9 @@ router.get("/usuario/checkTelefono/:telefono", usuario.checkTelefono);
 router.get("/usuarios/nacionalidad/:email", usuario.getAllNationalities);
 // // Retrieve distinct sedes
 router.get("/usuarios/sede/:email", usuario.getAllSedes);
-//
+// Get number of users by necesidades for excel
 router.get("/usuarios/count/nacionalidad", usuario.getCountUserByNationalities);
-//
+// Get number of users by necesidades for excel
 router.get("/usuarios/count/necesidad", usuario.getCountUserByNecesidad);
 //Delete user by nº documentación
 router.delete("/usuario/delete/:ndoc", usuario.deleteByNDoc)

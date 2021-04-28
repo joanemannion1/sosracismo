@@ -52,12 +52,7 @@ exports.createDoc = (req, res) => {
                             err.message || "Ha habido algun error creando la intervención."
                     });
                 });
-        }).catch(err => {
-            res.status(500).send({
-              message:
-                err.message || "Ha habido algun error creando la intervención."
-            });
-          });
+        })
     }
 
 }

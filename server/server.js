@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const server = express();
 const db = require("./models");
+
 const corsSettings = {
   originL: "http://localhost:8081"
 };
@@ -23,7 +24,6 @@ server.use((req, res, next) => {
 
 
 
-
 server.get("/", (req, res) => {
   res.json({ message: "La base de datos esta en marcha." });
 });
@@ -31,9 +31,12 @@ server.get("/", (req, res) => {
 // set listening ports for request
 const port = process.env.PORT || 8080;
 
-server.listen(port, () => {
-  console.log(`Server running on port : ${port}`);
-});
+module.exports = server
+
+
+// server.listen(port, () => {
+//   console.log(`Server running on port : ${port}`);
+// });
 // Run following function if you want drop existing tables and re-sync database
 // db.dropRestApiTable();
-db.databaseConf.sync();
+

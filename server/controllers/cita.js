@@ -28,11 +28,9 @@ exports.create = (req, res) => {
             const uct = {
                 id: data.id,
                 trabajadorId: req.body.formData.trabajador,
-                n_documentacion: req.body.formData.usuario
+                n_documentacion: (req.body.formData.usuario === '') ? null : req.body.formData.usuario
             }
-            Cita_Usuario_Trabajador.create(uct).then(data => {
-                res.send(data);
-            })
+            Cita_Usuario_Trabajador.create(uct)
                 .catch(err => {
                     res.status(500).send({
                         message:
@@ -72,20 +70,22 @@ exports.deleteCita = (request, result) => {
     }).then(num => {
             if (num === 1) {
                 Cita.destroy({
-                    where: { citaId: citaId }
+                    where: { 
+                      id: citaId 
+                    }
                   }).then(num => {
                     if (num === 1) {
                       result.send({
-                        message: "El trabajador ha sido eliminado correctamente."
+                        message: "La cita ha sido eliminado correctamente."
                       });
                     } else {
-                      result.send({
+                      result.status(500).send({
                         message: `No se ha podido eliminar la cita con id=${citaId}!`
                       });
                     }
                 })
             } else {
-              result.send({
+              result.status(500).send({
                 message: `No se ha podido eliminar la cita con id=${citaId}!`
               });
             }
