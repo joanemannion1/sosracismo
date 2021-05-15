@@ -21,6 +21,12 @@ var upload = multer({
 // Create an Intervencion
 exports.createDoc = (req, res) => {
     {
+        if (!req.body.casoId) {
+            res.status(400).send({
+              message: "Contenido no puede estar vacio!"
+            });
+            return;
+          }
 
         upload(req, res, (err) => {
             if (err) {
@@ -34,7 +40,8 @@ exports.createDoc = (req, res) => {
             console.log(req.files)
             Intervencion.create(intervencion)
                 .then(data => {
-                    req.files.map(file => {
+                    if(req.files) {
+                        req.files.map(file => {
                         var doc = {
                             intervencionId: data.id,
                             nombre: file.originalname,
@@ -44,7 +51,9 @@ exports.createDoc = (req, res) => {
                         Documento.create(doc).then(data => {
                         })
                     })
-                    res.send("La intervencion ha sido añadida")
+                    }
+                    
+                    res.send({message: "La intervencion ha sido añadida", data: data})
                 })
                 .catch(err => {
                     res.status(500).send({
@@ -107,7 +116,7 @@ exports.deleteById = (req, result) => {
             }).then(num => {
                 if (num === 1) {
                     result.send({
-                        message: "La intervención ha sido eliminado correctamente."
+                        message: "La intervención ha sido eliminada correctamente."
                     });
                 } else {
                     result.send({
@@ -116,7 +125,7 @@ exports.deleteById = (req, result) => {
                 }
             })
             result.send({
-                message: "La intervención ha sido eliminado correctamente."
+                message: "La intervención ha sido eliminada correctamente."
             });
         } else {
             result.send({

@@ -15,10 +15,11 @@ module.exports = (sequelize, DataTypes) => {
   };
   ProyectoExtranjeria.init({
     proyecto: DataTypes.STRING
-  }, {
+}, {
     freezeTableName: true,
     sequelize,
     modelName: 'ProyectoExtranjeria',
   });
+  ProyectoExtranjeria.removeAttribute('id');
   return ProyectoExtranjeria;
 };

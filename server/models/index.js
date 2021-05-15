@@ -38,27 +38,46 @@ db.proyectoextranjeria = require("./proyectoextranjeria")(database, Sequelize);
 db.intervenciones = require("./intervencion")(database, Sequelize);
 db.documentos = require("./documento")(database, Sequelize);
 
-db.trabajadores.belongsTo(db.sedes, {foreignKey: 'sedeId', as: 'id_sede'})
-db.usuarios.belongsTo(db.sedes, {foreignKey: 'sedeId', as: 'id_sede'})
-db.usuarios.belongsTo(db.trabajadores, {foreignKey: 'trabajadorId', as: 'id_trabajador'})
+db.sedes.belongsToMany(db.trabajadores, {through: 'Trabajador_sede', foreignKey: 'SedeId'})
+db.trabajadores.belongsToMany(db.sedes,{through: 'Trabajador_sede', foreignKey: 'TrabajadorId'})
 
-db.usuario_cita_trabajador.belongsTo(db.citas, {foreignKey: 'id', as: 'citaId'})
+db.sedes.hasMany(db.usuarios, {foreignKey: 'sedeId'})
+db.trabajadores.hasMany(db.usuarios, {foreignKey: 'trabajadorId'})
+
+db.usuarios.belongsTo(db.sedes, {foreignKey: 'sedeId'})
+db.usuarios.belongsTo(db.trabajadores, {foreignKey: 'trabajadorId'})
+
+db.citas.hasMany(db.usuario_cita_trabajador, {foreignKey: 'citaId', onDelete: 'cascade'})
+db.trabajadores.hasMany(db.usuario_cita_trabajador, {foreignKey: 'trabajadorId',onDelete: 'cascade'})
+db.usuarios.hasMany(db.usuario_cita_trabajador, {foreignKey: 'n_documentacion',onDelete: 'cascade'})
+db.usuario_cita_trabajador.belongsTo(db.citas, {foreignKey: 'citaId'})
 db.usuario_cita_trabajador.belongsTo(db.trabajadores, {foreignKey: 'trabajadorId'})
-db.usuario_cita_trabajador.belongsTo(db.usuarios, {foreignKey: 'n_documentacion', as: 'usuarioID'})
+db.usuario_cita_trabajador.belongsTo(db.usuarios, {foreignKey: 'n_documentacion'})
 
-db.casos.belongsTo(db.trabajadores, {foreignKey: 'trabajadorId', as: 'id_trabajador'})
+db.trabajadores.hasMany(db.casos, {foreingKey: 'trabajadorId'})
+db.casos.belongsTo(db.trabajadores, {foreignKey: 'trabajadorId'})
+
+db.usuarios.hasMany(db.casos, {foreingKey: 'n_documentacion'})
 db.casos.belongsTo(db.usuarios, {foreignKey: 'n_documentacion', as: 'usuarioId'})
-db.discriminaciones.belongsTo(db.casos, {foreignKey: 'id', as: 'casoId'})
-db.trabajadoras_hogar.belongsTo(db.casos, {foreignKey: 'id', as: 'casoId'})
-db.extranjerias.belongsTo(db.casos, {foreignKey: 'id', as: 'casoId'})
-db.externas.belongsTo(db.trabajadoras_hogar,{foreignKey:'id', as:'internaId'})
-db.internas.belongsTo(db.trabajadoras_hogar,{foreignKey:'id', as:'externaId'})
-db.necesidadextranjeria.belongsTo(db.extranjerias,{foreignKey:'id', as:'necesidadId'})
-db.proyectoextranjeria.belongsTo(db.extranjerias,{foreignKey:'id', as:'proyectoId'})
 
-db.intervenciones.belongsTo(db.casos,{foreignKey:'casoId', as:'caso'})
-db.documentos.belongsTo(db.intervenciones,{foreignKey:'intervencionId', as:'intervencion'})
+db.casos.hasMany(db.discriminaciones, {foreignKey: 'casoId', onDelete: 'cascade'})
+db.casos.hasMany(db.trabajadoras_hogar, {foreignKey: 'casoId', onDelete: 'cascade'})
+db.casos.hasMany(db.extranjerias, {foreignKey: 'casoId', onDelete: 'cascade'})
+db.casos.hasMany(db.proyectoextranjeria, {foreignKey: 'casoId', onDelete: 'cascade'})
+db.casos.hasMany(db.necesidadextranjeria, {foreignKey: 'casoId', onDelete: 'cascade'})
+db.casos.hasMany(db.internas, {foreignKey: 'casoId', onDelete: 'cascade'})
+db.casos.hasMany(db.externas, {foreignKey: 'casoId', onDelete: 'cascade'})
+db.discriminaciones.belongsTo(db.casos, {foreignKey: 'casoId'})
+db.trabajadoras_hogar.belongsTo(db.casos, {foreignKey: 'casoId'})
+db.extranjerias.belongsTo(db.casos,{foreignKey: 'casoId'})
 
+db.casos.hasMany(db.intervenciones, {foreignKey:'casoId', onDelete: 'cascade'})
+db.intervenciones.belongsTo(db.casos,{foreignKey:'casoId'})
+
+db.intervenciones.hasMany(db.documentos, {foreignKey:'intervencionId', onDelete: 'cascade'})
+db.documentos.belongsTo(db.intervenciones,{foreignKey:'intervencionId'})
+
+db.usuarios.hasMany(db.nacionalidades, {foreignKey: 'n_documentacion', onDelete: 'cascade'})
 db.nacionalidades.belongsTo(db.usuarios, {foreignKey: 'n_documentacion'})
 module.exports = db;
 

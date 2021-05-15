@@ -32,7 +32,7 @@ exports.createDiscriminacion = (req, res) => {
   Caso.create(caso)
     .then(data => {
       const discriminacionVar = {
-        id: data.id,
+        casoId: data.id,
         Situacion_documental: req.body.data.Situacion_documental,
         situacion_residencial: req.body.data.situacion_residencial,
         estudios: req.body.data.estudios,
@@ -53,9 +53,8 @@ exports.createDiscriminacion = (req, res) => {
         asumir: req.body.data.asumir,
         derivar: req.body.data.derivar
       }
-      console.log(discriminacionVar)
       Discriminacion.create(discriminacionVar).then(data => {
-        res.send({ message: " El caso ha sido añadido correctamente", caso: data.id })
+        res.send({ message: " El caso ha sido añadido correctamente", caso: data.casoId })
       }).catch(err => {
         res.status(500).send({
           message:
@@ -106,11 +105,11 @@ exports.updateDiscriminacion = (req, res) => {
   }
 
   Discriminacion.update(discriminacionVar, {
-    where: { id: id }
+    where: { casoId: id }
   }).then(num => {
     if (num == 1) {
       res.send({
-        message: "Caso was updated successfully."
+        message: "El caso ha sido actualizado correctamente."
       });
     } else {
       res.status(500).send({
@@ -145,8 +144,9 @@ exports.createTrabajadoraHogar = (req, res) => {
 
   Caso.create(caso)
     .then(data => {
+      id = data.dataValues.id
       const trabajadoraHogar = {
-        id: data.id,
+        casoId: id,
         motivo: req.body.data.motivo,
         n_casas: parseInt(req.body.data.n_casas),
         regularizada: req.body.data.regularizada === 'true' ? true : false,
@@ -178,12 +178,12 @@ exports.createTrabajadoraHogar = (req, res) => {
       TrabajadoraHogar.create(trabajadoraHogar).then(data => {
         if (req.body.data.permiso_salida) {
           const internaVar = {
-            id: data.id,
+            casoId: id,
             permiso_salida: req.body.data.permiso_salida,
             descanso_semanal: req.body.data.descanso_semanal,
           };
           Interna.create(internaVar).then(data => {
-            res.send({ message: " El caso ha sido añadido correctamente", caso: data.id })
+            res.status(200).send({ message: " El caso ha sido añadido correctamente", caso: id })
           }).catch(err => {
             res.status(500).send({
               message:
@@ -192,10 +192,10 @@ exports.createTrabajadoraHogar = (req, res) => {
           });
         } else {
           const externa = {
-            id: data.id
+            casoId: id
           }
           Externa.create(externa).then(data => {
-            res.send({ message: " El caso ha sido añadido correctamente", caso: data.id })
+            res.status(200).send({ message: " El caso ha sido añadido correctamente", caso: id })
           }).catch(err => {
             res.status(500).send({
               message:
@@ -254,11 +254,12 @@ exports.updateTrabajadoraHogar = (req, res) => {
   }
 
   TrabajadoraHogar.update(trabajadoraHogar, {
-    where: { id: id }
+    where: { casoId: id }
   }).then(num => {
+    console.log(num)
     if (num == 1) {
       res.send({
-        message: "Caso was updated successfully."
+        message: "El caso ha sido actualizado correctamente."
       });
     } else {
       res.send({
@@ -291,20 +292,21 @@ exports.createExtranjeria = (req, res) => {
 
   Caso.create(caso)
     .then(data => {
+      id = data.id
       const extranjeriaVar = {
-        id: data.id,
+        casoId: data.id,
       }
       Extranjeria.create(extranjeriaVar).then(data => {
         req.body.data.necesidad.map(necesidadVar => {
           NecesidadExtranjeria.create({
-            id: data.id,
+            casoId: id,
             necesidad: necesidadVar
           })
 
         })
         req.body.data.proyectos.map(proyectoVar => {
           ProyectoExtranjeria.create({
-            id: data.id,
+            casoId: id,
             proyecto: proyectoVar
           })
 
@@ -325,28 +327,27 @@ exports.updateExtranjeria = (req, res) => {
   const id = req.params.id;
 
   const extranjeriaVar = {
-    id: id
+    updatedAt: new Date()
   }
   Extranjeria.update(extranjeriaVar, {
-    where: { id: id }
+    where: { casoId: id }
   }).then(num => {
     if (num == 1) {
       NecesidadExtranjeria.destroy({
-        where: { id: id }
+        where: { casoId: id }
       })
       req.body.data.necesidad.map(necesidadVar => {
         NecesidadExtranjeria.create({
-          id: id,
+          casoId: id,
           necesidad: necesidadVar
         })
       })
-
       ProyectoExtranjeria.destroy({
-        where: { id: id }
+        where: { casoId: id }
       })
       req.body.data.proyectos.map(proyectoVar => {
         ProyectoExtranjeria.create({
-          id: id,
+          casoId: id,
           proyecto: proyectoVar
         })
       })
@@ -403,10 +404,10 @@ exports.getCasoById = (req, result) => {
       id: id
     },
   }).then(data => {
-      result.send(data);
-    }).catch(error => {
-      result.status(400).send(error)
-    })
+    result.send(data);
+  }).catch(error => {
+    result.status(400).send(error)
+  })
 };
 
 // Retrieve caso by id
@@ -414,18 +415,18 @@ exports.getCasoEspecificoDiscriminacionId = (req, result) => {
   const id = req.params.id;
   Discriminacion.findAll({
     where: {
-      id: id
+      casoId: id
     },
   }).then(data => {
-      result.send(data);
-    }).catch(error => {
-      result.status(400).send(error)
-    })
+    result.send(data);
+  }).catch(error => {
+    result.status(400).send(error)
+  })
 };
 
 exports.getCasoEspecificoTrabajadoraId = (req, result) => {
   const id = req.params.id;
-  db.databaseConf.query("SELECT * FROM TrabajadoraHogar LEFT JOIN Interna On TrabajadoraHogar.id = Interna.id WHERE TrabajadoraHogar.id = " + id).then(results => {
+  db.databaseConf.query("SELECT * FROM TrabajadoraHogar LEFT JOIN Interna On TrabajadoraHogar.casoId = Interna.casoId WHERE TrabajadoraHogar.casoId = " + id).then(results => {
     result.send(results[0])
   }).catch(err => {
     res.status(500).send({
@@ -437,7 +438,7 @@ exports.getCasoEspecificoTrabajadoraId = (req, result) => {
 
 exports.getCasoEspecificoExtranjeriaId = (req, result) => {
   const id = req.params.id;
-  db.databaseConf.query("SELECT * FROM Extranjeria WHERE Extranjeria.id = " + id).then(results => {
+  db.databaseConf.query("SELECT * FROM Extranjeria WHERE Extranjeria.casoId = " + id).then(results => {
     result.send(results[0])
   }).catch(err => {
     res.status(500).send({
@@ -452,7 +453,7 @@ exports.getNecesidadExtranjeriaId = (req, result) => {
   const id = req.params.id;
   NecesidadExtranjeria.findAll({
     where: {
-      id: id
+      casoId: id
     },
   })
     .then(data => {
@@ -467,7 +468,7 @@ exports.getProyectoExtranjeriaId = (req, result) => {
   const id = req.params.id;
   ProyectoExtranjeria.findAll({
     where: {
-      id: id
+      casoId: id
     },
   })
     .then(data => {
@@ -480,10 +481,10 @@ exports.getProyectoExtranjeriaId = (req, result) => {
 //Retrieve tablename of a Caso
 exports.getCasoType = (req, result) => {
   const id = req.params.id;
-  db.databaseConf.query("SELECT id,tablename FROM (SELECT id, 'Extranjeria' AS tablename FROM Extranjeria WHERE id = " + id + " UNION ALL SELECT id, 'TrabajadoraHogar' as tablename From TrabajadoraHogar WHERE id = " + id + " UNION ALL Select id, 'Discriminacion' as tablename FROM Discriminacion WHERE id = " + id + ") AS X").then(results => {
+  db.databaseConf.query("SELECT casoId,tablename FROM (SELECT casoId, 'Extranjeria' AS tablename FROM Extranjeria WHERE casoId = " + id + " UNION ALL SELECT casoId, 'TrabajadoraHogar' as tablename From TrabajadoraHogar WHERE casoId = " + id + " UNION ALL Select casoId, 'Discriminacion' as tablename FROM Discriminacion WHERE casoId = " + id + ") AS X").then(results => {
     result.send(results[0])
   }).catch(err => {
-    res.status(500).send({
+    result.status(500).send({
       message:
         err.message || "Ha habido algun error creando el caso."
     });
@@ -491,18 +492,16 @@ exports.getCasoType = (req, result) => {
 }
 
 // Retrieve all necesidades with Id
-exports.finalizarCaso = (req, result) => {
+exports.finalizarCaso = (req, res) => {
   const id = req.params.id;
   Caso.update(
     { finalizado: '1' },
     { where: { id: id } }
+  ).then(result => {
+    res.status(200).send({ message: "El caso ha sido finalizado correctamente" })
+  }).catch(err =>
+    res.status(500).send({ message: "Ha habido algun error, no se ha podido finalizar el caso" })
   )
-    .then(result =>
-      result.send(result)
-    )
-    .catch(err =>
-      result.send(err)
-    )
 };
 
 // Retrieve all casos from database 
@@ -525,51 +524,6 @@ exports.getAllCasosNoFinalizados = (req, result) => {
 //Delete caso by Id
 exports.deleteById = (req, result) => {
   var id = req.params.id;
-  Interna.destroy({
-    where: { id: id }
-  }).catch(err => {
-    result.status(500).send({
-      message: err.message || `Ha habido algun error eliminando el caso con id=${id}!`
-    });
-  });
-
-  Externa.destroy({
-    where: { id: id }
-  }).catch(err => {
-    result.status(500).send({
-      message: err.message || `Ha habido algun error eliminando el caso con id=${id}!`
-    });
-  });
-
-  TrabajadoraHogar.destroy({
-    where: { id: id }
-  }).catch(err => {
-    result.status(500).send({
-      message: err.message || `Ha habido algun error eliminando el caso con id=${id}!`
-    });
-  });
-
-  Discriminacion.destroy({
-    where: { id: id }
-  }).catch(err => {
-    result.status(500).send({
-      message: err.message || `Ha habido algun error eliminando el caso con id=${id}!`
-    });
-  });
-  NecesidadExtranjeria.destroy({
-    where: { id: id }
-  }).catch(err => {
-    result.status(500).send({
-      message: err.message || `Ha habido algun error eliminando el caso con id=${id}!`
-    });
-  });
-  Extranjeria.destroy({
-    where: { id: id }
-  }).catch(err => {
-    result.status(500).send({
-      message: err.message || `Ha habido algun error eliminando el caso con id=${id}!`
-    });
-  });
   Caso.destroy({
     where: {
       id: id

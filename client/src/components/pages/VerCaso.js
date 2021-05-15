@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
 import axios from 'axios'
 import Container from '@material-ui/core/Container';
 import { makeStyles } from '@material-ui/core/styles';
@@ -10,7 +9,7 @@ import ExtranjeriaForm from './ExtranjeriaForm';
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import Menu from '../Navbar'
-import auth from '../auth';
+import { authenticationService } from '../../_services';
 import history from '../../history';
 
 const useStyles = makeStyles((theme) => ({
@@ -25,11 +24,12 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function VerCaso({ casoId }) {
-    useEffect(() => {
-		if(!auth.isAuthenticated()) {
-			history.push('/LogIn')
-		}
-	}, []);
+    let currentUser = ''
+    if (authenticationService.currentUserValue) { 
+        currentUser = authenticationService.currentUserValue
+    }else {
+        history.push('/LogIn')
+    }
     const classes = useStyles();
 
     const [caso, setCaso] = useState([]);

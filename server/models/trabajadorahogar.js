@@ -46,5 +46,6 @@ module.exports = (sequelize, DataTypes) => {
     sequelize,
     modelName: 'TrabajadoraHogar',
   });
+  TrabajadoraHogar.removeAttribute('id');
   return TrabajadoraHogar;
 };

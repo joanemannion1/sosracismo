@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { AppBar, Toolbar, Typography, Drawer, CssBaseline, List, ListItem, ListItemIcon } from '@material-ui/core';
+import { AppBar, Toolbar, Drawer, CssBaseline, List, ListItem, ListItemIcon } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import Checkbox from '@material-ui/core/Checkbox';
 import ListItemText from '@material-ui/core/ListItemText';
@@ -12,9 +12,9 @@ import Collapse from '@material-ui/core/Collapse';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import Navbar from './Navbar'
-import auth from './auth';
 import history from '../history';
 import { nacionalidadList } from './NacionalidadList'
+import { authenticationService } from '../_services';
 
 const drawerWidth = 240;
 
@@ -42,11 +42,14 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function FilterSideBar() {
-    useEffect(() => {
-		if(!auth.isAuthenticated()) {
-			history.push('/LogIn')
-		}
-	}, []);
+     
+    let currentUser = ''
+    if (authenticationService.currentUserValue) { 
+        currentUser = authenticationService.currentUserValue.token
+    }else {
+        history.push('/LogIn')
+    }
+      
     
     const classes = useStyles();
     const [checkedNacionalidad, setCheckedNacionalidad] = useState([]);
@@ -91,13 +94,12 @@ export default function FilterSideBar() {
     };
 
     const getNacionalidad = async () => {
-        return fetch('http://localhost:8080/usuarios/nacionalidad/{email}'.replace('{email}', localStorage.token))
+        return fetch('http://localhost:8080/usuarios/nacionalidad/{email}'.replace('{email}',currentUser))
             .then(response => response.json())
             .then(data => {
                 setNacionalidad(data)
                 const newArray = [];
                 data.map((val) => { newArray.push(val.nacionalidad); });
-                console.log(newArray)
                 setCheckedNacionalidad(newArray)
             }).catch(error => {
                 console.log("Ha habido un error obteniendo los datos")
@@ -105,7 +107,7 @@ export default function FilterSideBar() {
     }
 
     const getSede = async () => {
-        return fetch('http://localhost:8080/usuarios/sede/{email}'.replace('{email}', localStorage.token))
+        return fetch('http://localhost:8080/usuarios/sede/{email}'.replace('{email}', currentUser))
             .then(response => response.json())
             .then(data => {
                 const newArray = [];

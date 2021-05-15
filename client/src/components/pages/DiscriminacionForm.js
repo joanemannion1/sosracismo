@@ -4,7 +4,7 @@ import axios from 'axios';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
 import Button from '@material-ui/core/Button';
-import auth from '../auth';
+import { authenticationService } from '../../_services';
 import history from '../../history';
 
 function Alert(props) {
@@ -12,11 +12,12 @@ function Alert(props) {
 }
 
 export default function DiscriminacionForm({ usuario, caso }) {
-    useEffect(() => {
-		if(!auth.isAuthenticated()) {
-			history.push('/LogIn')
-		}
-	}, []);
+    let currentUser = ''
+    if (authenticationService.currentUserValue) { 
+        currentUser = authenticationService.currentUserValue
+    }else {
+        history.push('/LogIn')
+    }
     
     
     const isAddMode = !caso;
@@ -53,7 +54,7 @@ export default function DiscriminacionForm({ usuario, caso }) {
     const onSubmit = (data, e) => {
         data = {
             n_documentacion: usuario,
-            trabajadorId: localStorage.email,
+            trabajadorId: currentUser.email,
             ...data
         }
         return isAddMode

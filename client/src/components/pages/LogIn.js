@@ -4,30 +4,45 @@ import { useForm } from 'react-hook-form';
 import axios from 'axios';
 import history from '../../history';
 import auth from '../auth'
+import { authenticationService } from '../../_services';
 
 export default function LogIn() {
+    if (authenticationService.currentUserValue) { 
+        history.push('/');
+    }
 
     const { register, errors, handleSubmit } = useForm();
     const [error, setError] = useState(false)
 
-    const onSubmit = (data, e) => {
-        axios.post('http://localhost:8080/trabajador/login', {
-            email: data.email,
-            contraseña: data.contraseña
-        }).then(res => {
-            localStorage.setItem('token', res.data.accessToken);
-            localStorage.setItem('email', res.data.result.email);
-            auth.email = res.data.result.email
-            auth.login(() => {
-              history.push('/');
-            })
-        }).catch(error => {
-            setError(true)
-        })
+   const onSubmit =(data) => {
+        authenticationService.login(data.email, data.contraseña)
+            .then(
+                user => {
+                    history.push('/');
+                },
+                error => {
+                    console.log(error)
+                }
+            );
+    }
+    // const onSubmit = (data, e) => {
+    //     axios.post('http://localhost:8080/trabajador/login', {
+    //         email: data.email,
+    //         contraseña: data.contraseña
+    //     }).then(res => {
+    //         localStorage.setItem('token', res.data.accessToken);
+    //         localStorage.setItem('email', res.data.result.email);
+    //         auth.email = res.data.result.email
+    //         auth.login(() => {
+    //           history.push('/');
+    //         })
+    //     }).catch(error => {
+    //         setError(true)
+    //     })
 
         // limpiar campos
-        e.target.reset();
-    }
+    //     e.target.reset();
+    // }
 
     return (
         <>

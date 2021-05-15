@@ -2,15 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
 import { extranjeriaList, proyectosList } from '../extranjeriaList'
-import Radio from '@material-ui/core/Radio';
-import RadioGroup from '@material-ui/core/RadioGroup';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormControl from '@material-ui/core/FormControl';
-import FormLabel from '@material-ui/core/FormLabel';
 import Snackbar from '@material-ui/core/Snackbar';
 import Button from '@material-ui/core/Button';
 import MuiAlert from '@material-ui/lab/Alert';
-import auth from '../auth';
+import { authenticationService } from '../../_services';
 import history from '../../history';
 
 function Alert(props) {
@@ -18,11 +14,12 @@ function Alert(props) {
 }
 
 export default function ExtranjeriaForm({ usuario, caso }) {
-    useEffect(() => {
-		if(!auth.isAuthenticated()) {
-			history.push('/LogIn')
-		}
-	}, []);
+    let currentUser = ''
+    if (authenticationService.currentUserValue) { 
+        currentUser = authenticationService.currentUserValue
+    }else {
+        history.push('/LogIn')
+    }
     
     const isAddMode = !caso;
 
@@ -89,7 +86,7 @@ export default function ExtranjeriaForm({ usuario, caso }) {
     const onSubmit = (data, e) => {
         data = {
             n_documentacion: usuario,
-            trabajadorId: localStorage.email,
+            trabajadorId: currentUser.email,
             necesidad: checkedNecesidad,
             proyectos: checkedProyecto
 

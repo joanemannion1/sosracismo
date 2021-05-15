@@ -39,4 +39,4 @@ module.exports = server
 // });
 // Run following function if you want drop existing tables and re-sync database
 // db.dropRestApiTable();
-
+db.databaseConf.sync();

@@ -17,7 +17,7 @@ import GroupIcon from '@material-ui/icons/Group';
 import Collapse from '@material-ui/core/Collapse';
 import Menu from '../Navbar'
 import { createFilterOptions } from '@material-ui/lab/Autocomplete';
-import auth from '../auth';
+import { authenticationService } from '../../_services';
 import history from '../../history';
 
 const drawerWidth = 300;
@@ -52,11 +52,13 @@ require('moment/locale/es.js')
 const MySwal = withReactContent(Swal)
 
 export default function Citas() {
-    useEffect(() => {
-		if(!auth.isAuthenticated()) {
-			history.push('/LogIn')
-		}
-	}, []);
+    let currentUser = ''
+    if (authenticationService.currentUserValue) { 
+        currentUser = authenticationService.currentUserValue
+    }else {
+        history.push('/LogIn')
+    }
+      
     
     const classesDrawer = useStylesDrawer();
     const [citas, setCitas] = useState([]);
@@ -66,7 +68,7 @@ export default function Citas() {
     const [usuariosDefault, setUsuariosDefault] = useState([])
     const localizer = momentLocalizer(moment);
     const [alert, setAlert] = useState(null);
-    const [checkedTrabajador, setCheckedTrabajador] = useState([localStorage.email]);
+    const [checkedTrabajador, setCheckedTrabajador] = useState([currentUser.email]);
 
     const updateCitas = async () => {
         const filtered = citas.filter(cita => {
@@ -105,7 +107,7 @@ export default function Citas() {
     });
     const classes = useStyles();
     const getUsers = async () => {
-        return fetch('http://localhost:8080/usuarios/all/{email}'.replace('{email}', localStorage.token))
+        return fetch('http://localhost:8080/usuarios/all/{email}'.replace('{email}', currentUser.token))
             .then(response => response.json())
             .then(data => {
                 const filteredUsers = data.filter(function (a) {
@@ -298,7 +300,7 @@ export default function Citas() {
                     fechaFin: enddate.toDate(),
                     notas: document.getElementById('notas').value,
                     usuario: document.getElementById('usuario').value,
-                    trabajador: localStorage.email
+                    trabajador: currentUser.email
 
                 }
 

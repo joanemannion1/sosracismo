@@ -4,45 +4,23 @@ import Menu from '../Navbar'
 import { nacionalidadList } from '../NacionalidadList'
 import { useLocation } from "react-router-dom";
 import axios from 'axios';
-import { Button, Modal, Container, Row, Col } from 'react-bootstrap';
-import auth from '../auth';
+import { Container, Row, Col } from 'react-bootstrap';
+import { authenticationService } from '../../_services';
 import history from '../../history';
 
 export default function ExportExcel() {
-    useEffect(() => {
-		if(!auth.isAuthenticated()) {
-			history.push('/LogIn')
-		}
-	}, []);
+    let currentUser = ''
+    if (authenticationService.currentUserValue) { 
+        currentUser = authenticationService.currentUserValue
+    }else {
+        history.push('/LogIn')
+    }
     
     const [nacionalidad, setNacionalidad] = useState([]);
     const [necesidad, setNecesidad] = useState([]);
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
     const location = useLocation();
-
-
-    const getNacionalidad = async () => {
-        setStartDate(location.state.startDate)
-        setEndDate(location.state.endDate)
-        return fetch('http://localhost:8080/usuarios/count/nacionalidad'.replace('{email}', localStorage.email))
-            .then(response => response.json())
-            .then(data => {
-                console.log(data)
-                setNacionalidad(data);
-            }).catch(error => {
-                console.log("Ha habido un error obteniendo los datos")
-            })
-    }
-
-    const getNecesidad = async () => {
-        axios.post('http://localhost:8080/necesidadUsuario/', { startDate: startDate, endDate: endDate })
-            .then(response => {
-                setNecesidad(response.data);
-            }).catch(error => {
-                console.log("Ha habido un error obteniendo los datos")
-            })
-    }
 
     const filterDate = (e) => {
         if (e.target.name === 'fechaInicio') {
@@ -54,9 +32,30 @@ export default function ExportExcel() {
 
     }
 
+    useEffect(() => { 
+        const getNecesidad = async () => {
+            axios.post('http://localhost:8080/necesidadUsuario/', { startDate: startDate, endDate: endDate })
+                .then(response => {
+                    setNecesidad(response.data);
+                }).catch(error => {
+                    console.log("Ha habido un error obteniendo los datos")
+                })
+        }
+    
+     }, []);
 
-    useEffect(() => { getNacionalidad() }, []);
-    useEffect(() => { getNecesidad() }, [startDate, endDate]);
+    useEffect(() => { const getNacionalidad = async () => {
+        setStartDate(location.state.startDate)
+        setEndDate(location.state.endDate)
+        return fetch('http://localhost:8080/usuarios/count/nacionalidad'.replace('{email}', currentUser.email))
+            .then(response => response.json())
+            .then(data => {
+                console.log(data)
+                setNacionalidad(data);
+            }).catch(error => {
+                console.log("Ha habido un error obteniendo los datos")
+            })
+    } }, [startDate, endDate]);
 
     return (
         <div>

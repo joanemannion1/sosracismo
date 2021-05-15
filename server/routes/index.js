@@ -36,7 +36,7 @@ router.put("/trabajador/update", trabajador.updatePasswordByEmail);
 // // Delete trabajador by email
 router.delete("/trabajador/delete/:email", trabajador.deleteTrabajadorByEmail);
 // Delete all trabajadores
-router.delete("/trabajadores/deleteAll", trabajador.deleteAllTrabajadores);
+// router.delete("/trabajadores/deleteAll", trabajador.deleteAllTrabajadores);
 //Log in trabajador
 router.post("/trabajador/login", trabajador.logIn);
 //Log in trabajador

@@ -10,6 +10,8 @@ import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import auth from '../auth';
 import history from '../../history';
+import { authHeader, handleResponse } from '../../_helpers';
+import { authenticationService } from '../../_services';
 
 const useStyles = makeStyles((theme) => ({
     margin: {
@@ -21,12 +23,14 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function VerUsuario(filters) {
-    useEffect(() => {
-		if(!auth.isAuthenticated()) {
-			history.push('/LogIn')
-		}
-	}, []);
-    
+
+    let currentUser = ''
+    if (authenticationService.currentUserValue) { 
+        currentUser = authenticationService.currentUserValue.token
+    }else {
+        history.push('/LogIn')
+    }
+      
     const classes = useStyles();
     const [usuarios, setUsuarios] = useState([]);
     const [usuariosRepeated, setUsuariosRepeated] = useState([]);
@@ -117,7 +121,7 @@ export default function VerUsuario(filters) {
     const handleClose = () => setOpenModal(false);
 
     const getData = async () => {
-        return await fetch('http://localhost:8080/usuarios/all/{email}'.replace('{email}', localStorage.token))
+        return await fetch('http://localhost:8080/usuarios/all/{email}'.replace('{email}', currentUser))
             .then(response => response.json())
             .then(data => {
                 const filteredUsers = data.filter(function (a) {
@@ -133,7 +137,7 @@ export default function VerUsuario(filters) {
     }
 
     const getCasos = async () => {
-        return await fetch('http://localhost:8080/casos/all/{email}'.replace('{email}', localStorage.token))
+        return await fetch('http://localhost:8080/casos/all/{email}'.replace('{email}', currentUser))
             .then(response => response.json())
             .then(data => {
                 setAllCasos(data);

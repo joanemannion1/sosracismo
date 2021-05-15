@@ -20,5 +20,6 @@ module.exports = (sequelize, DataTypes) => {
     sequelize,
     modelName: 'NecesidadExtranjeria',
   });
+  NecesidadExtranjeria.removeAttribute('id');
   return NecesidadExtranjeria;
 };

@@ -19,5 +19,6 @@ module.exports = (sequelize, DataTypes) => {
     sequelize,
     modelName: 'Externa',
   });
+  Externa.removeAttribute('id');
   return Externa;
 };

@@ -4,21 +4,22 @@ import Menu from '../Navbar'
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import axios from 'axios';
-import auth from '../auth';
+import { authenticationService } from '../../_services';
 import history from '../../history';
 
 export default function VerCasosNoFinalizados() {
-    useEffect(() => {
-		if(!auth.isAuthenticated()) {
-			history.push('/LogIn')
-		}
-	}, []);
+    let currentUser = ''
+    if (authenticationService.currentUserValue) { 
+        currentUser = authenticationService.currentUserValue
+    }else {
+        history.push('/LogIn')
+    }
     const [AllCasos, setAllCasos] = useState([]);
 
     const MySwal = withReactContent(Swal)
 
     const getCasos = async () => {
-        return fetch('http://localhost:8080/casos/allActive/{email}'.replace('{email}', localStorage.token))
+        return fetch('http://localhost:8080/casos/allActive/{email}'.replace('{email}', currentUser.token))
             .then(response => response.json())
             .then(data => {
                 setAllCasos(data);

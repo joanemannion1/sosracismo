@@ -4,9 +4,25 @@ import '../css/Navbar.css'
 import { Nav, Navbar, NavDropdown } from 'react-bootstrap'
 import { Link } from 'react-router-dom';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
-import auth from './auth';
+import axios from 'axios';
+import { authenticationService } from '../_services';
 
 function Menu() {
+    let isAdmin = false
+    let currentUser = ''
+    if (authenticationService.currentUserValue) { 
+        currentUser = authenticationService.currentUserValue
+    }
+    axios.get("http://localhost:8080/authenticate/trabajador", {
+            headers: { 'x-access-token': currentUser.token },
+        }).then((response) => {
+            if (response.data.admin === 1) {
+                isAdmin = true;
+            }
+            else {
+                isAdmin = false;
+            }
+        })
     const navDropdownTitle = (<><AccountCircleIcon /> Mi perfil</>);
     return (
         <>
@@ -32,8 +48,8 @@ function Menu() {
                         <NavDropdown title={navDropdownTitle} id="collasible-nav-dropdown" style={{ paddingRight: 60 }}>
                             <NavDropdown.Item><Link to='/CambiarContraseña' className='nav-links'>Cambiar Contraseña</Link></NavDropdown.Item>
                            
-                            <NavDropdown.Item><Link to='/CrearTrabajador' className='nav-links'>Añadir Trabajador</Link></NavDropdown.Item>
-                            <NavDropdown.Item><Link to='/CrearSede' className='nav-links'>Crear sede</Link></NavDropdown.Item>
+                            {isAdmin ? <NavDropdown.Item><Link to='/CrearTrabajador' className='nav-links'>Añadir Trabajador</Link></NavDropdown.Item> : null}
+                            {isAdmin ? <NavDropdown.Item><Link to='/CrearSede' className='nav-links'>Crear sede</Link></NavDropdown.Item> : null }
                             <NavDropdown.Divider />
                             <NavDropdown.Item><Link to='/LogOut' className='nav-links'>Log out</Link></NavDropdown.Item>
                         </NavDropdown>

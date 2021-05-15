@@ -114,5 +114,6 @@ module.exports = (sequelize, DataTypes) => {
       sequelize,
       modelName: 'Discriminacion',
     });
+  Discriminacion.removeAttribute('id');
 return Discriminacion;
 };

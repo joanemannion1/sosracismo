@@ -1,25 +1,33 @@
 import axios from 'axios';
-import React,  { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { CirclePicker } from 'react-color';
 import { useForm } from 'react-hook-form';
 import * as emailjs from 'emailjs-com'
 import Menu from '../Navbar'
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
-import auth from '../auth';
 import history from '../../history';
+import { authenticationService } from '../../_services';
 function Alert(props) {
-	return <MuiAlert elevation={6} variant="filled" {...props} />;
+    return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
 
 export default function CrearTrabajador() {
-    useEffect(() => {
-		if(!auth.isAuthenticated()) {
-			history.push('/LogIn')
-		}
-	}, []);
-    
-    const {register, errors, handleSubmit} = useForm();
+    let currentUser = ''
+    if (authenticationService.currentUserValue) {
+        currentUser = authenticationService.currentUserValue.token
+        axios.get("http://localhost:8080/authenticate/trabajador", {
+            headers: { 'x-access-token': currentUser },
+        }).then((response) => {
+            if (response.data.admin !== 1) {
+                history.push('/')
+            }
+        })
+    } else {
+        history.push('/LogIn')
+    }
+
+    const { register, errors, handleSubmit } = useForm();
 
     const [sedes, setSedes] = useState([]);
     const [selectedColor, setColor] = useState([111111]);
@@ -37,18 +45,18 @@ export default function CrearTrabajador() {
         setOpen(false);
     };
 
-    useEffect(() => {    
+    useEffect(() => {
         axios.get('http://localhost:8080/sedes/all').then(res => {
             setSedes(res.data);
         })
-        .catch(err => {
-            console.log(err);
-        })    
+            .catch(err => {
+                console.log(err);
+            })
     });
 
     let crypto = require("crypto");
     let password = crypto.randomBytes(5).toString('hex');
-    
+
     const onSubmit = (data, e) => {
         data = {
             ...data,
@@ -57,28 +65,28 @@ export default function CrearTrabajador() {
         }
         console.log(data);
         axios.post('http://localhost:8080/trabajador/create', { data }).then(res => {
-            
+
             let templateParams = {
                 from_name: 'joane.mannion13@gmail.com',
                 to_name: data.email,
                 subject: 'SOS RACISMO',
                 password: data.contraseña
-               }     
-    
+            }
+
             emailjs.send(
                 'service_6gkhf4w',
                 'template_mjg30ud',
-                 templateParams,
-                 'user_dYPPsJY5jx9QOXeLRqfAQ'
-            ).then(function(response) {
+                templateParams,
+                'user_dYPPsJY5jx9QOXeLRqfAQ'
+            ).then(function (response) {
                 console.log('SUCCESS!', response.status, response.text);
-             }, function(error) {
+            }, function (error) {
                 console.log('FAILED...', error);
-             });
+            });
             setOpen(true)
         }).catch((error) => {
-           setError(true)
-          })
+            setError(true)
+        })
 
 
         // limpiar campos
@@ -87,7 +95,7 @@ export default function CrearTrabajador() {
 
     return (
         <>
-        <Menu />
+            <Menu />
             <form onSubmit={handleSubmit(onSubmit)}>
                 <div className="jumbotron vertical-center bg-white">
                     <div className="w-50 container padding25">
@@ -95,13 +103,13 @@ export default function CrearTrabajador() {
 
                         <div className="form-group">
                             <label>Nombre completo</label>
-                            <input type="text" id="inputEmail"  className="mb-3 form-control" name="nombre" placeholder="John Doe" required autoFocus
+                            <input type="text" id="inputEmail" className="mb-3 form-control" name="nombre" placeholder="John Doe" required autoFocus
                                 ref={register({
                                     required: {
-                                        value: true, 
+                                        value: true,
                                         message: 'Nombre es requerido'
-                                        }
-                                    })}/>
+                                    }
+                                })} />
                             <span className="text-danger text-small d-block mb-2">
                                 {errors.nombre && errors.nombre.message}
                             </span>
@@ -109,13 +117,13 @@ export default function CrearTrabajador() {
 
                         <div className="form-group">
                             <label>Email</label>
-                            <input type="email" id="inputEmail"  className="mb-3 form-control" name="email" placeholder="example@example.com" required autoFocus
+                            <input type="email" id="inputEmail" className="mb-3 form-control" name="email" placeholder="example@example.com" required autoFocus
                                 ref={register({
                                     required: {
-                                        value: true, 
+                                        value: true,
                                         message: 'Email es requerido'
-                                        }
-                                    })}/>
+                                    }
+                                })} />
                             <span className="text-danger text-small d-block mb-2">
                                 {errors.email && errors.email.message}
                             </span>
@@ -124,28 +132,28 @@ export default function CrearTrabajador() {
                         <div className="form-group">
                             <label>Sede</label>
                             <select className="form-control" name="sede" ref={register}>
-                            {
-                            sedes.map((val) => {
-                                return <option value={val.sedeId} key={val.sedeId}>{val.nombre}</option>;
-                            })
-                            }
+                                {
+                                    sedes.map((val) => {
+                                        return <option value={val.sedeId} key={val.sedeId}>{val.nombre}</option>;
+                                    })
+                                }
                             </select>
                         </div>
 
                         <div className="form-group">
                             <div className="form-check">
-                                <input className="form-check-input" type="checkbox" value={1} name="admin" ref={register}/>
+                                <input className="form-check-input" type="checkbox" value={1} name="admin" ref={register} />
                                 <label className="form-check-label">
                                     Es administrador
                                 </label>
                             </div>
                         </div>
-                     
+
                         <div className="row justify-content-md-center">
                             <div className="form-group">
                                 <label>Color: </label>
                                 <CirclePicker
-                                onChangeComplete={ color => setColor(color.hex) } />
+                                    onChangeComplete={color => setColor(color.hex)} />
                             </div>
                         </div>
 

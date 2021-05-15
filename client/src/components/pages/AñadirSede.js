@@ -1,12 +1,10 @@
 import axios from 'axios';
 import React,  { useState, useEffect } from 'react';
-import { CirclePicker } from 'react-color';
 import { useForm } from 'react-hook-form';
-import * as emailjs from 'emailjs-com'
 import Menu from '../Navbar'
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
-import auth from '../auth';
+import { authenticationService } from '../../_services';
 import history from '../../history';
 function Alert(props) {
 	return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -14,12 +12,20 @@ function Alert(props) {
 
 
 export default function CrearSede() {
-    useEffect(() => {
-		if(!auth.isAuthenticated()) {
-			history.push('/LogIn')
-		}
-	}, []);
-
+    let currentUser = ''
+    if (authenticationService.currentUserValue) { 
+        currentUser = authenticationService.currentUserValue.token
+        axios.get("http://localhost:8080/authenticate/trabajador", {
+            headers: { 'x-access-token': currentUser },
+        }).then((response) => {
+            if (response.data.admin !== 1) {
+               history.push('/')
+            }
+        })
+    } else {
+        history.push('/LogIn')
+    }
+    
     
     const {register, errors, handleSubmit} = useForm();
 

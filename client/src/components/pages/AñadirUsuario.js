@@ -4,19 +4,26 @@ import { useForm } from 'react-hook-form';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
 import Menu from '../Navbar'
-import auth from '../auth';
 import history from '../../history';
 import { nacionalidadList } from '../NacionalidadList'
 import IconButton from '@material-ui/core/IconButton';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import CloseIcon from '@material-ui/icons/Close';
-
+import { authenticationService } from '../../_services';
 function Alert(props) {
 	return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
 
 
 export default function AñadirUsuario({ usuario }) {
+
+	let currentUser = ''
+    if (authenticationService.currentUserValue) { 
+        currentUser = authenticationService.currentUserValue
+    }else {
+        history.push('/LogIn')
+    }
+      
 
 	const isAddMode = !usuario;
 
@@ -29,12 +36,6 @@ export default function AñadirUsuario({ usuario }) {
 	const [telefonoExists, setTelefonoExists] = useState(false)
 
 	useEffect(() => {
-		if(!auth.isAuthenticated()) {
-			history.push('/LogIn')
-		}
-	},[]);
-
-	useEffect(() => {
 		axios.get('http://localhost:8080/sedes/all').then(res => {
 			setSedes(res.data);
 		}).catch(err => {
@@ -45,7 +46,7 @@ export default function AñadirUsuario({ usuario }) {
 	const onSubmit = (data, e) => {
 		data = {
 			...data,
-			trabajadorId: localStorage.email
+			trabajadorId: currentUser.email
 		}
 		return isAddMode
 			? createUser(data)
@@ -206,7 +207,7 @@ export default function AñadirUsuario({ usuario }) {
 							<div className="form-row">
 								<div className="form-group col-md-6">
 									<label>Sede</label>
-									<select className="form-control" name="sedeId" defaultValue={localStorage.sedeId} ref={register}>
+									<select className="form-control" name="sedeId" ref={register}>
 										{
 											sedes.map((val) => {
 												return <option value={val.sedeId} key={val.sedeId}>{val.nombre}</option>;

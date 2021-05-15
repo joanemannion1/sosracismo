@@ -2,7 +2,7 @@ const db = require("../models");
 const Trabajador = db.trabajadores;
 const Sequelize = require('sequelize');
 const { param } = require("../routes");
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const BCRYPT_SALT_ROUNDS = 12;
 const jwt = require("jsonwebtoken");
 const config = require("../config/auth.config.js");
@@ -64,7 +64,7 @@ exports.getTrabajadorByEmail = (request, result) => {
   Trabajador.findAll({
     where: { email: paramEmail }
   }).then(data => {
-    if (!data[0].email) {
+    if (!data[0]) {
       result.status(500).send({message: "Ese trabajador no existe"})
     } else {
       result.send(data);
@@ -82,9 +82,8 @@ exports.updatePasswordByEmail = (request, result) => {
       email: request.body.email,
     },
   }).then(trabajador => {
-    console.log(trabajador)
     if (trabajador == null) {
-      result.status(403).send('Trabajador no existe en la base de datos');
+      result.status(403).send({ message: 'Trabajador no existe en la base de datos'});
     } else if (trabajador != null) {
       var passwordIsValid = bcrypt.compareSync(
         request.body.contraseña_actual,
@@ -109,8 +108,6 @@ exports.updatePasswordByEmail = (request, result) => {
           result.status(200).send({ message: 'contraseña actualizada' });
         });
 
-    } else {
-      result.status(401).json('no trabajador exists in db to update');
     }
   });
 }
@@ -140,16 +137,10 @@ exports.logIn = (request, result) => {
     }
 
     var token = jwt.sign({ email: user.email, admin: user.admin }, config.secret, {
-      expiresIn: 86400, //5minutu probazeko//86400 // 24 hours
+      expiresIn: 86400, //5minutu probazeko //86400 // 24 hours
     });
 
-    result.json({ auth: true, accessToken: token, result: { nombre: user.nombre, sede: user.sede, admin: user.admin, email: user.email } })
-    // result.status(200).send({
-    //   nombre: user.nombre,
-    //   sede: user.sedeId,
-    //   admin: user.admin,
-    //   accessToken: token
-    // });
+    result.json({ auth: true, token: token, nombre: user.nombre, sede: user.sede, admin: user.admin, email: user.email })
   }).catch(err => {
     result.status(500).send({ message: err.message });
   });
@@ -162,7 +153,7 @@ exports.deleteTrabajadorByEmail = (request, result) => {
     where: { email: paramEmail }
   }).then(num => {
     if (num === 1) {
-      result.send({
+      result.status(200).send({
         message: "El trabajador ha sido eliminado correctamente."
       });
     } else {
@@ -177,19 +168,19 @@ exports.deleteTrabajadorByEmail = (request, result) => {
   });
 };
 
-// Delete all Trabajadores from the database.
-exports.deleteAllTrabajadores = (request, result) => {
-  Trabajador.destroy({
-    where: {},
-    truncate: false
-  }).then(nums => {
-    result.send({
-      message: `${nums} trabajadores han sido eliminados correctamente!`
-    });
-  }).catch(err => {
-    result.status(500).send({
-      message: err.message || "Ha habido algun error, no se han podido eliminar trabajadores}!"
-    });
-  });
-};
+// // Delete all Trabajadores from the database.
+// exports.deleteAllTrabajadores = (request, result) => {
+//   Trabajador.destroy({
+//     where: {},
+//     truncate: false
+//   }).then(nums => {
+//     result.send({
+//       message: `${nums} trabajadores han sido eliminados correctamente!`
+//     });
+//   }).catch(err => {
+//     result.status(500).send({
+//       message: err.message || "Ha habido algun error, no se han podido eliminar trabajadores}!"
+//     });
+//   });
+// };
 

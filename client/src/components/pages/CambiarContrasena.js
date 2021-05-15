@@ -6,7 +6,7 @@ import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
 import Button from '@material-ui/core/Button';
 import history from '../../history';
-
+import { authenticationService } from '../../_services';
 function Alert(props) {
     return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
@@ -14,6 +14,11 @@ function Alert(props) {
 
 export default function CambiarContrasena() {
 
+
+    let showMenu = false
+    if (authenticationService.currentUserValue) {
+        showMenu = true
+    }
     const { register, errors, handleSubmit } = useForm();
 
     // MUI ALERT
@@ -51,7 +56,7 @@ export default function CambiarContrasena() {
     return (
         <>
 
-            <Menu />
+            {showMenu ? <Menu /> : null }
             <div className="jumbotron vertical-center bg-white">
                 <div className="w-25 container padding25">
                     <form className="form-signin" onSubmit={handleSubmit(onSubmit)}>

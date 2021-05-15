@@ -2,7 +2,6 @@ const db = require("../models");
 const Usuario = db.usuarios;
 const Nacionalidad = db.nacionalidades;
 const Sequelize = require('sequelize');
-const { param } = require("../routes");
 const jwt = require('jsonwebtoken')
 const config = require("../config/auth.config.js");
 
@@ -184,7 +183,7 @@ exports.update = (req, res) => {
           message: "User was updated successfully."
         });
       } else {
-        res.send({
+        res.status(500).send({
           message: `Cannot update User with id=${id}. Maybe User was not found or req.body is empty!`
         });
       }
@@ -197,12 +196,12 @@ exports.update = (req, res) => {
     });
 };
 
-exports.deleteByNDoc = (req, res) => {
+exports.deleteByNDoc = (req, result) => {
   var ndoc = req.params.ndoc;
 
   Usuario.destroy({
     where: {
-      n_documentacion: id
+      n_documentacion: ndoc
     }
   }).then(num => {
     if (num === 1) {
@@ -210,7 +209,7 @@ exports.deleteByNDoc = (req, res) => {
         message: "El usuario ha sido eliminado correctamente."
       });
     } else {
-      result.send({
+      result.status(500).send({
         message: `No se ha podido eliminar el usuario con id=${ndoc}!`
       });
     }
