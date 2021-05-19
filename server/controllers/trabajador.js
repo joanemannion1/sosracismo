@@ -1,5 +1,6 @@
 const db = require("../models");
 const Trabajador = db.trabajadores;
+const TrabajadorSede = db.trabajador_sedes;
 const Sequelize = require('sequelize');
 const { param } = require("../routes");
 const bcrypt = require('bcryptjs');
@@ -22,7 +23,6 @@ exports.create = (req, res) => {
     nombre: req.body.data.nombre,
     email: req.body.data.email,
     admin: req.body.data.admin ? 1 : 0,
-    sedeId: req.body.data.sede,
     color: req.body.data.color,
   };
   // Create a Trabajador
@@ -30,26 +30,77 @@ exports.create = (req, res) => {
     .then(hashedPassword => {
       trabajador['contraseña'] = hashedPassword
       Trabajador.create(trabajador)
-      .then(data => {
-        res.status(200).send(data);
-      })
-      .catch(err => {
-        res.status(500).send({
-          message:
-            err.message || "Ha habido algun error creando el usuario."
+        .then(data => {
+          req.body.data.sede.map(sede => {
+            TrabajadorSede.create({
+              sedeId: sede.sedeId,
+              trabajadorId: req.body.data.email
+            })
+          })
+          res.status(200).send(data);
+        })
+        .catch(err => {
+          console.log(err.message)
+          res.status(500).send({
+            message:
+              err.message || "Ha habido algun error creando el usuario."
+          });
         });
-      });
     })
 
 
-  // Save Trabajador in the database
- 
 };
+
+exports.update = (req, res) => {
+  if (!req.body.data.email) {
+    res.status(400).send({
+      message: "Contenido no puede estar vacio!"
+    });
+    return;
+  }
+
+  const trabajador = {
+    nombre: req.body.data.nombre,
+    email: req.body.data.email,
+    admin: req.body.data.admin ? 1 : 0,
+    color: req.body.data.color,
+  };
+  // Update a Trabajador
+  Trabajador.update(trabajador, {
+    where: { email: trabajador.email }
+  }).then(num => {
+    if (num[0] === 1) {
+      TrabajadorSede.destroy({
+        where: {
+          trabajadorId: trabajador.email
+        }
+      })
+      req.body.data.sede.map(sede => {
+        TrabajadorSede.create({
+          sedeId: sede.sedeId,
+          trabajadorId: req.body.data.email
+        })
+      })
+      res.status(200).send(trabajador);
+    } else {
+      res.status(500).send({
+        message: `Cannot update Trabajador with email=${trabajador.email}. Maybe Trabajador was not found or req.body is empty!`
+      });
+    }
+  })
+    .catch(err => {
+      res.status(500).send({
+        message:
+          err.message || "Ha habido algun error actualizando el trabajador."
+      });
+    });
+}
 
 // Retrieve all Trabajadores from the database.
 exports.getAllTrabajadores = (_, result) => {
-  Trabajador.findAll()
+  Trabajador.findAll({ include: TrabajadorSede })
     .then(data => {
+      console.log(data)
       result.send(data);
     }).catch(err => {
       result.status(500).send({
@@ -58,22 +109,21 @@ exports.getAllTrabajadores = (_, result) => {
     });
 };
 
+
 // Find a single Trabajador with an id
 exports.getTrabajadorByEmail = (request, result) => {
   const paramEmail = request.params.email;
-  Trabajador.findAll({
-    where: { email: paramEmail }
-  }).then(data => {
-    if (!data[0]) {
-      result.status(500).send({message: "Ese trabajador no existe"})
+  db.databaseConf.query("SELECT Trabajador.*, Trabajador_sede.sedeId FROM Trabajador LEFT OUTER JOIN Trabajador_sede on Trabajador.email = Trabajador_sede.trabajadorId WHERE Trabajador.email = '" + paramEmail + "'").then(results => {
+    if (!(results[0][0])) {
+      result.status(500).send({ message: "Ese trabajador no existe" })
     } else {
-      result.send(data);
+      result.send(results[0])
     }
-  }).catch(err => {
+  }).catch(errorr => {
     result.status(500).send({
-      message: err.message || `Ha habido algun error consiguiendo el trabajador con email : ${paramEmail}`
+      message: errorr.message || `Ha habido algun error consiguiendo el trabajador con email : ${paramEmail}`
     });
-  });
+  })
 };
 
 exports.updatePasswordByEmail = (request, result) => {
@@ -83,7 +133,7 @@ exports.updatePasswordByEmail = (request, result) => {
     },
   }).then(trabajador => {
     if (trabajador == null) {
-      result.status(403).send({ message: 'Trabajador no existe en la base de datos'});
+      result.status(403).send({ message: 'Trabajador no existe en la base de datos' });
     } else if (trabajador != null) {
       var passwordIsValid = bcrypt.compareSync(
         request.body.contraseña_actual,

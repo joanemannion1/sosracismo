@@ -294,10 +294,10 @@ export default function DiscriminacionForm({ usuario, caso }) {
                     <textarea className="form-control" ref={register} name="otros" rows="2"></textarea>
                 </div>
 
-                <button type="submit" name="submit" onClick={handleSubmit(onSubmit)} className="btn btn-primary" >{isAddMode ? 'Añadir Caso' : 'Actualizar caso'}</button>
+                <button type="submit" name="discriminacionSubmit" onClick={handleSubmit(onSubmit)} className="btn btn-primary" >{isAddMode ? 'Añadir Caso' : 'Actualizar caso'}</button>
             </form>
 
-            <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+            <Snackbar open={open} autoHideDuration={6000} id="successAlert" onClose={handleClose}>
                 <Alert onClose={handleClose} severity="success">
                     El caso ha sido {isAddMode ? 'añadido' : 'actualizado'} correctamente!
                     {isAddMode ? <Button size="small" onClick={goToVerCaso}>VER CASO</Button> : null }

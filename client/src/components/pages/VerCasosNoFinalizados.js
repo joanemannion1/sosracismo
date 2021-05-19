@@ -5,27 +5,55 @@ import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import axios from 'axios';
 import { authenticationService } from '../../_services';
-import history from '../../history';
+// import history from '../../history';
+import { useHistory } from "react-router-dom";
 
-export default function VerCasosNoFinalizados() {
+export default function VerCasosNoFinalizados({ todos }) {
+    const history = useHistory()
     let currentUser = ''
-    if (authenticationService.currentUserValue) { 
-        currentUser = authenticationService.currentUserValue
-    }else {
-        history.push('/LogIn')
+    if (todos) {
+        if (authenticationService.currentUserValue) {
+            currentUser = authenticationService.currentUserValue.token
+            axios.get("http://localhost:8080/authenticate/trabajador", {
+                headers: { 'x-access-token': currentUser },
+            }).then((response) => {
+                if (response.data.admin !== 1) {
+                    history.push('/')
+                }
+            })
+        } else {
+            history.push('/LogIn')
+        }
+    } else {
+        if (authenticationService.currentUserValue) {
+            currentUser = authenticationService.currentUserValue
+        } else {
+            history.push('/LogIn')
+        }
     }
+
     const [AllCasos, setAllCasos] = useState([]);
 
     const MySwal = withReactContent(Swal)
 
     const getCasos = async () => {
-        return fetch('http://localhost:8080/casos/allActive/{email}'.replace('{email}', currentUser.token))
-            .then(response => response.json())
-            .then(data => {
-                setAllCasos(data);
-            }).catch(error => {
-                console.log("Ha habido un error obteniendo los datos")
-            })
+        if (todos) {
+            return fetch('http://localhost:8080/casos/allExisting')
+                .then(response => response.json())
+                .then(data => {
+                    setAllCasos(data);
+                }).catch(error => {
+                    console.log("Ha habido un error obteniendo los datos")
+                })
+        } else {
+            return fetch('http://localhost:8080/casos/allActive/{email}'.replace('{email}', currentUser.token))
+                .then(response => response.json())
+                .then(data => {
+                    setAllCasos(data);
+                }).catch(error => {
+                    console.log("Ha habido un error obteniendo los datos")
+                })
+        }
     }
 
     const goToVerCaso = (index) => {
@@ -78,7 +106,9 @@ export default function VerCasosNoFinalizados() {
         })
     }
 
-    useEffect(() => { getCasos() }, []);
+
+
+    useEffect(() => { getCasos() },[todos]);
 
     return (
         <>
@@ -91,7 +121,8 @@ export default function VerCasosNoFinalizados() {
                                 <th scope="col" className="border-0 text-uppercase font-medium pl-4">#</th>
                                 <th scope="col" className="border-0 text-uppercase font-medium">Usuario</th>
                                 <th scope="col" className="border-0 text-uppercase font-medium">Finalizado</th>
-                                <th scope="col" className="border-0 text-uppercase font-medium">Última actualización</th>
+                                <th scope="col" className="border-0 text-uppercase font-medium">Update</th>
+                                {todos ? <th scope="col" className="border-0 text-uppercase font-medium">Trabajador</th> : null}
                                 <th scope="col" className="border-0 text-uppercase font-medium">Editar</th>
                             </tr>
                         </thead>
@@ -111,6 +142,12 @@ export default function VerCasosNoFinalizados() {
                                             <td>
                                                 <span className="text-muted" >{val.updatedAt.substring(0, 10)}</span><br />
                                             </td>
+                                            {todos
+                                                ? <td>
+                                                    <span className="text-muted" >{val.trabajadorId}</span><br />
+                                                </td>
+                                                : null
+                                            }
                                             <td>
                                                 <button type='button' title="Añadir intervención" className='btn btn-outline-info btn-circle btn-lg btn-circle ml-2' onClick={() => goToAñadirIntervencion(val.id)}>
                                                     <PlusCircleFill />

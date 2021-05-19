@@ -1,55 +1,47 @@
 import React, { useState, useEffect } from 'react';
-import { Download, PlusCircleFill } from 'react-bootstrap-icons';
 import Menu from '../Navbar'
 import axios from 'axios';
-import GetAppIcon from '@material-ui/icons/GetApp';
-import download from 'downloadjs'
-import IconButton from '@material-ui/core/IconButton';
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import { authenticationService } from '../../_services';
 import history from '../../history';
-require("downloadjs")
 
-export default function VerIntervenciones({ casoId }) {
+export default function VerTrabajadores() {
     let currentUser = ''
-    if (authenticationService.currentUserValue) { 
-        currentUser = authenticationService.currentUserValue
-    }else {
+    if (authenticationService.currentUserValue) {
+        currentUser = authenticationService.currentUserValue.token
+        axios.get("http://localhost:8080/authenticate/trabajador", {
+            headers: { 'x-access-token': currentUser },
+        }).then((response) => {
+            if (response.data.admin !== 1) {
+                history.push('/')
+            }
+        })
+    } else {
         history.push('/LogIn')
     }
-    const [AllIntervenciones, setAllIntervenciones] = useState([]);
+    const [AllTrabajadores, setAllTrabajadores] = useState([]);
 
     const MySwal = withReactContent(Swal)
 
-    const getCasos = async () => {
-        return fetch('http://localhost:8080/intervenciones/caso/{casoId}'.replace('{casoId}', casoId))
+    const getTrabajadores = async () => {
+        return fetch('http://localhost:8080/trabajadores/all')
             .then(response => response.json())
             .then(data => {
-                setAllIntervenciones(data);
+                setAllTrabajadores(data);
             }).catch(error => {
                 console.log("Ha habido un error obteniendo los datos")
             })
     }
 
-    const downloadFile = async (id, filename, type) => {
-        axios.get('http://localhost:8080/file/download/{id}'.replace('{id}', id),{
-            responseType: 'blob'
-          }).then(res => {
-            return download(res.data, filename, type)
-        }).catch((error) => {
-            alert('Ha habido un error descargando el documento, lo sentimos')
-        })
+    const goToEditTrabajador = (email) => {
+        history.push('/ActualizarTrabajador/{id}'.replace('{id}', email));
     }
 
-    const goToEditarIntervencion = (index) => {
-        history.push('/ActualizarIntervencion/{intervencion}'.replace('{intervencion}', index));
-    }
-
-    const eliminarIntervencion = (id) => {
+    const deleteTrabajador = (email) => {
         MySwal.fire({
             title: 'Estas segura?',
-            text: "Esta intervención será eliminada!",
+            text: "Este trabajador será eliminado!",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#d33',
@@ -58,11 +50,11 @@ export default function VerIntervenciones({ casoId }) {
             reverseButtons: true
         }).then((result) => {
             if (result.isConfirmed) {
-                axios.delete('http://localhost:8080/intervencion/delete/{id}'.replace('{id}', id))
+                axios.delete('http://localhost:8080/trabajador/delete/{id}'.replace('{id}', email))
                     .then(res => {
                         MySwal.fire(
                             'Eliminado!',
-                            'La intervención ha sido eliminada.',
+                            'El trabajador ha sido eliminado.',
                             'success'
                         )
                         window.location.href = window.location.href
@@ -70,7 +62,7 @@ export default function VerIntervenciones({ casoId }) {
                     .catch(err => {
                         MySwal.fire(
                             'Ha habido algun error!',
-                            'La intervención no se ha eliminado.',
+                            'El trabajador no se ha eliminado.',
                             'warning'
                         )
                     })
@@ -81,14 +73,14 @@ export default function VerIntervenciones({ casoId }) {
             ) {
                 MySwal.fire(
                     'Cancelado',
-                    'La intervención no se ha eliminado :)',
+                    'El trabajador no se ha eliminado :)',
                     'error'
                 )
             }
         })
     }
 
-    useEffect(() => { getCasos() }, []);
+    useEffect(() => { getTrabajadores() }, []);
 
     return (
         <>
@@ -101,38 +93,35 @@ export default function VerIntervenciones({ casoId }) {
                             <tr>
                                 <th scope="col" className="border-0 text-uppercase font-medium pl-4">#</th>
                                 <th scope="col" className="border-0 text-uppercase font-medium">Nombre</th>
-                                <th scope="col" className="border-0 text-uppercase font-medium">Descripcion</th>
+                                <th scope="col" className="border-0 text-uppercase font-medium">Localidad</th>
                                 <th scope="col" className="border-0 text-uppercase font-medium">Fecha</th>
-                                <th scope="col" className="border-0 text-uppercase font-medium">Documento</th>
+                                <th scope="col" className="border-0 text-uppercase font-medium">Admin</th>
                                 <th scope="col" className="border-0 text-uppercase font-medium">Editar</th>
                             </tr>
                         </thead>
                         <tbody>
                             {
-                                AllIntervenciones.map((val, i) => {
+                                AllTrabajadores.map((val, i) => {
                                     return (
                                         <tr key={i}>
-                                            <td className="pl-4">{val.id}</td>
+                                            <td className="pl-4">{i}</td>
                                             <td>
                                                 <span className="text-muted" >{val.nombre}</span><br />
                                             </td>
                                             <td>
-                                                <span className="text-muted" >{val.descripcion}</span><br />
+                                                <span className="text-muted" >{val.email}</span><br />
                                             </td>
                                             <td>
                                                 <span className="text-muted" >{val.createdAt.substring(0, 10)}</span><br />
                                             </td>
                                             <td>
-                                                { val.docNombre ? (<IconButton onClick={() => downloadFile(val.docId, val.docNombre, val.type)} size="small">
-                                                    <GetAppIcon fontSize="inherit" />
-                                                </IconButton>) : null }
-                                                <span className="text-muted" onClick={() => downloadFile(val.docId, val.docNombre, val.type)} >{val.docNombre}</span><br />
+                                                <span className="text-muted" >{val.admin ? 'Sí' : 'No'}</span><br />
                                             </td>
                                             <td>
-                                                <button type='button'  onClick={() => goToEditarIntervencion(val.id)} className='btn btn-outline-info btn-circle btn-lg btn-circle ml-2'>
+                                                <button type='button'  onClick={() => goToEditTrabajador(val.email)} className='btn btn-outline-info btn-circle btn-lg btn-circle ml-2'>
                                                     <i className='fa fa-edit'></i>
                                                 </button>
-                                                <button type='button' onClick={() => eliminarIntervencion(val.id)} className='btn btn-outline-danger btn-circle btn-lg btn-circle ml-2'>
+                                                <button type='button' onClick={() => deleteTrabajador(val.email)} className='btn btn-outline-danger btn-circle btn-lg btn-circle ml-2'>
                                                     <i className='fa fa-trash'></i>
                                                 </button>
                                             </td>

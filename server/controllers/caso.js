@@ -504,7 +504,7 @@ exports.finalizarCaso = (req, res) => {
   )
 };
 
-// Retrieve all casos from database 
+// Retrieve all casos no finalizados from database 
 exports.getAllCasosNoFinalizados = (req, result) => {
   const email = req.params.email;
   jwt.verify(email, config.secret, (err, decoded) => {
@@ -517,6 +517,15 @@ exports.getAllCasosNoFinalizados = (req, result) => {
         result.status(400).send(error)
       })
     }
+  })
+};
+
+// Retrieve all casos from database 
+exports.getAllExistingCasos = (req, result) => {
+  db.databaseConf.query("SELECT Caso.*, Usuario.nombre AS nombre, Usuario.apellido1 , Usuario.apellido2 FROM Caso Left Join Usuario on Caso.n_documentacion = Usuario.n_documentacion").then(results => {
+    result.send(results[0])
+  }).catch(error => {
+    result.status(400).send(error)
   })
 
 };

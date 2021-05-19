@@ -17,8 +17,11 @@ import CrearSede from './components/pages/AñadirSede'
 import VerCasosNoFinalizados from './components/pages/VerCasosNoFinalizados'
 import VerIntervenciones from './components/pages/VerIntervenciones'
 import ExportExcel from './components/pages/ExportExcel'
+import VerSedes from './components/pages/VerSedes'
+import VerTrabajadores from './components/pages/VerTrabajadores';
 import history from './history';
 import { authHeader } from './_helpers';
+
 
 function App() {
 
@@ -36,11 +39,17 @@ function App() {
         <Route exact path="/VerUsuario" render={() => ((!localStorage.getItem('currentUser')) ? <Redirect to="/LogIn" /> : (<VerUsuario />))} />
         <Route exact path="/Citas" render={() => ((!localStorage.getItem('currentUser')) ? <Redirect to="/LogIn" /> : (<Citas />))} />
         <Route exact path="/AñadirIntervencion/:caso" render={({ match }) => ((!localStorage.getItem('currentUser')) ? <Redirect to="/LogIn" /> : (<AñadirIntervencion caso={match.params.caso} />))} />
+        <Route exact path="/ActualizarIntervencion/:intervencion" render={({ match }) => ((!localStorage.getItem('currentUser')) ? <Redirect to="/LogIn" /> : (<AñadirIntervencion updateIntervencion={match.params.intervencion} />))} />
         <Route exact path="/CrearTrabajador" render={() => ((!localStorage.getItem('currentUser')) ? <Redirect to="/LogIn" /> : (<CrearTrabajador />))} />
+        <Route exact path="/ActualizarTrabajador/:trabajadorId" render={({ match }) => ((!localStorage.getItem('currentUser')) ? <Redirect to="/LogIn" /> : (<CrearTrabajador trabajadorId={match.params.trabajadorId}/>))} />
+        <Route exact path="/VerTrabajadores" render={() => ((!localStorage.getItem('currentUser')) ? <Redirect to="/LogIn" /> : (<VerTrabajadores />))} />
         <Route exact path="/CambiarContraseña" render={() => (<CambiarContrasena />)} />
         <Route exact path="/SideBar" render={() => ((!localStorage.getItem('currentUser')) ? <Redirect to="/LogIn" /> : (<FilterSideBar />))} />
-        <Route exact path="/CasosNoFinalizados" render={() => ((!localStorage.getItem('currentUser')) ? <Redirect to="/LogIn" /> : (<VerCasosNoFinalizados />))} />
+        <Route exact path="/CasosNoFinalizados" render={() => ((!localStorage.getItem('currentUser')) ? <Redirect to="/LogIn" /> : (<VerCasosNoFinalizados todos={false}/>))} />
+        <Route exact path="/VerCasosTotales" render={() => ((!localStorage.getItem('currentUser')) ? <Redirect to="/LogIn" /> : (<VerCasosNoFinalizados todos={true} />))} />
         <Route exact path="/CrearSede" render={() => ((!localStorage.getItem('currentUser')) ? <Redirect to="/LogIn" /> : (<CrearSede />))} />
+        <Route exact path="/VerSedes" render={() => ((!localStorage.getItem('currentUser')) ? <Redirect to="/LogIn" /> : (<VerSedes />))} />
+        <Route exact path="/ActualizarSede/:sedeId" render={({ match }) => ((!localStorage.getItem('currentUser')) ? <Redirect to="/LogIn" /> : (<CrearSede sedeId={match.params.sedeId}/>))} />
         <Route exact path="/VerIntervencion/:caso" render={({ match }) => ((!localStorage.getItem('currentUser')) ? <Redirect to="/LogIn" /> : (<VerIntervenciones casoId={match.params.caso} />))} />
       </Switch>
     </Router>

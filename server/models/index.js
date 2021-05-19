@@ -23,6 +23,7 @@ db.databaseConf = database;
 // };
 db.trabajadores = require("./trabajador")(database, Sequelize);
 db.sedes = require("./sede")(database, Sequelize);
+db.trabajador_sedes = require("./trabajador_sede")(database, Sequelize);
 db.usuarios = require("./usuario")(database, Sequelize);
 db.nacionalidades = require("./nacionalidad")(database, Sequelize);
 db.citas = require("./cita")(database, Sequelize);
@@ -38,14 +39,19 @@ db.proyectoextranjeria = require("./proyectoextranjeria")(database, Sequelize);
 db.intervenciones = require("./intervencion")(database, Sequelize);
 db.documentos = require("./documento")(database, Sequelize);
 
-db.sedes.belongsToMany(db.trabajadores, {through: 'Trabajador_sede', foreignKey: 'SedeId'})
-db.trabajadores.belongsToMany(db.sedes,{through: 'Trabajador_sede', foreignKey: 'TrabajadorId'})
+// Many to many
+db.sedes.hasMany(db.trabajador_sedes, {foreignKey: 'sedeId', onDelete: 'cascade'})
+db.trabajador_sedes.belongsTo(db.sedes, {foreignKey: 'sedeId'})
+
+db.trabajadores.hasMany(db.trabajador_sedes, {foreignKey: 'trabajadorId', onDelete: 'cascade'})
+db.trabajador_sedes.belongsTo(db.trabajadores, {foreignKey: 'trabajadorId'})
 
 db.sedes.hasMany(db.usuarios, {foreignKey: 'sedeId'})
 db.trabajadores.hasMany(db.usuarios, {foreignKey: 'trabajadorId'})
 
 db.usuarios.belongsTo(db.sedes, {foreignKey: 'sedeId'})
 db.usuarios.belongsTo(db.trabajadores, {foreignKey: 'trabajadorId'})
+
 
 db.citas.hasMany(db.usuario_cita_trabajador, {foreignKey: 'citaId', onDelete: 'cascade'})
 db.trabajadores.hasMany(db.usuario_cita_trabajador, {foreignKey: 'trabajadorId',onDelete: 'cascade'})

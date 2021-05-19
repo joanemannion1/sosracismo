@@ -7,192 +7,193 @@ const Cita = db.citas;
 
 let tokenVar = ''
 
-describe('Tests for Sede', () => {
+// describe('Tests for Sede', () => {
 
-  beforeAll(async () => {
-    await db.databaseConf.sync();
-  });
+//   beforeAll(async () => {
+//     await db.databaseConf.sync();
+//   });
 
-  it('Creates a Sede', async () => {
-    data = { nombre: 'Hernaniko Sos', localidad: 'Hernani' }
-    const response = await request
-      .post('/sede/create')
-      .send({ data })
+//   it('Creates a Sede', async () => {
+//     data = { nombre: 'Hernaniko Sos', localidad: 'Hernani' }
+//     const response = await request
+//       .post('/sede/create')
+//       .send({ data })
 
-    expect(response.status).toBe(200)
-    expect(response.body).toHaveProperty('localidad')
-  })
+//     expect(response.status).toBe(200)
+//     expect(response.body).toHaveProperty('localidad')
+//   })
 
-  it('Gives error if we dont send data', async () => {
-    data = {}
-    const response = await request
-      .post('/sede/create')
-      .send({ data })
+//   it('Gives error if we dont send data', async () => {
+//     data = {}
+//     const response = await request
+//       .post('/sede/create')
+//       .send({ data })
 
-    expect(response.status).toBe(400)
-    expect(response.body).toHaveProperty('message', "Contenido no puede estar vacio!")
-  })
+//     expect(response.status).toBe(400)
+//     expect(response.body).toHaveProperty('message', "Contenido no puede estar vacio!")
+//   })
 
-  it('Gets all sedes', async () => {
-    const response = await request
-      .get('/sedes/all')
+//   it('Gets all sedes', async () => {
+//     const response = await request
+//       .get('/sedes/all')
 
-    expect(response.status).toBe(200)
-  })
+//     expect(response.status).toBe(200)
+//   })
 
-})
+// })
 
-describe('Tests for Trabajador', () => {
+// describe('Tests for Trabajador', () => {
 
-  // beforeAll(async () => {
-  //   await db.databaseConf.sync();
-  // });
+//   // beforeAll(async () => {
+//   //   await db.databaseConf.sync();
+//   // });
 
-  it('Creates a Trabajador', async () => {
-    const data = {
-      nombre: 'Langile Izena',
-      email: 'eposta@langilea.com',
-      contraseña: 'pasahitza',
-      admin: 1,
-      sedeId: 3,
-      color: '673ab7',
-    };
-    const response = await request
-      .post('/trabajador/create')
-      .send({ data })
+//   it('Creates a Trabajador', async () => {
+//     const data = {
+//       nombre: 'Langile Izena',
+//       email: 'eposta@langilea.com',
+//       contraseña: 'pasahitza',
+//       admin: 1,
+//       sede: [{ localidad: 'sede0', sedeId: 2 }, { localidad: 'sede1', sedeId: 3 }],
+//       color: '673ab7',
+//     };
+//     const response = await request
+//       .post('/trabajador/create')
+//       .send({ data })
 
-    expect(response.status).toBe(200)
-    expect(response.body).toHaveProperty('nombre', 'Langile Izena')
-  })
+//     expect(response.status).toBe(200)
+//     expect(response.body).toHaveProperty('nombre', 'Langile Izena')
+//   })
 
-  it('Create Trabajador : Gives error if we dont send data', async () => {
-    data = {}
-    const response = await request
-      .post('/trabajador/create')
-      .send({ data })
+//   it('Create Trabajador : Gives error if we dont send data', async () => {
+//     data = {}
+//     const response = await request
+//       .post('/trabajador/create')
+//       .send({ data })
 
-    expect(response.status).toBe(400)
-    expect(response.body).toHaveProperty('message', "Contenido no puede estar vacio!")
-  })
+//     expect(response.status).toBe(400)
+//     expect(response.body).toHaveProperty('message', "Contenido no puede estar vacio!")
+//   })
 
-  it("Can't create Trabajador with email that exists", async () => {
-    const data = {
-      nombre: 'Langile Izena',
-      email: 'eposta@langilea.com',
-      contraseña: 'pasahitza',
-      admin: 1,
-      sedeId: 3,
-      color: '673ab7',
-    };
-    const response = await request
-      .post('/trabajador/create')
-      .send({ data })
+//   it("Can't create Trabajador with email that exists", async () => {
+//     const data = {
+//       nombre: 'Langile Izena',
+//       email: 'eposta@langilea.com',
+//       contraseña: 'pasahitza',
+//       admin: 1,
+//       sedeId: [{ localidad: 'sede0', sedeId: 2 }],
+//       color: '673ab7',
+//     };
+//     const response = await request
+//       .post('/trabajador/create')
+//       .send({ data })
 
-    expect(response.status).toBe(500)
-    expect(response.body).toHaveProperty('message')
-  })
+//     expect(response.status).toBe(500)
+//     expect(response.body).toHaveProperty('message')
+//   })
 
-  it('Gets all trabajadores', async () => {
-    const response = await request
-      .get('/trabajadores/all')
+//   it('Gets all trabajadores', async () => {
+//     const response = await request
+//       .get('/trabajadores/all')
 
-    expect(response.status).toBe(200)
-  })
+//       console.log(response)
+//     expect(response.status).toBe(200)
+//   })
 
-  it('Gets all trabajador by Email', async () => {
-    const response = await request
-      .get('/trabajador/eposta@langilea.com')
+//   it('Gets all trabajador by Email', async () => {
+//     const response = await request
+//       .get('/trabajador/eposta@langilea.com')
 
-    expect(response.status).toBe(200)
-    expect(response.body[0]).toHaveProperty('nombre', 'Langile Izena')
-  })
+//     expect(response.status).toBe(200)
+//     expect(response.body[0]).toHaveProperty('nombre', 'Langile Izena')
+//   })
 
-  it("Can't find trabajador that doesn't exist", async () => {
-    const response = await request
-      .get('/trabajador/epostaezezaguna@langilea.com')
+//   it("Can't find trabajador that doesn't exist", async () => {
+//     const response = await request
+//       .get('/trabajador/epostaezezaguna@langilea.com')
 
-    expect(response.status).toBe(500)
-    expect(response.body).toHaveProperty('message', 'Ese trabajador no existe')
-  })
+//     expect(response.status).toBe(500)
+//     expect(response.body).toHaveProperty('message', 'Ese trabajador no existe')
+//   })
 
-  it('Updates a Trabajador Password', async () => {
-    const response = await request
-      .put('/trabajador/update')
-      .send({
-        email: 'eposta@langilea.com',
-        contraseña: 'pasahitza2',
-        contraseña_actual: 'pasahitza',
-      })
+//   it('Updates a Trabajador Password', async () => {
+//     const response = await request
+//       .put('/trabajador/updatePassword')
+//       .send({
+//         email: 'eposta@langilea.com',
+//         contraseña: 'pasahitza2',
+//         contraseña_actual: 'pasahitza',
+//       })
 
-    expect(response.status).toBe(200)
-  })
+//     expect(response.status).toBe(200)
+//   })
 
-  it('Cant update a Trabajador Password if doesnt exist', async () => {
-    const response = await request
-      .put('/trabajador/update')
-      .send({
-        email: 'epostaezezaguna@langilea.com',
-        contraseña: 'pasahitza2',
-        contraseña_actual: 'pasahitza',
-      })
+//   it('Cant update a Trabajador Password if doesnt exist', async () => {
+//     const response = await request
+//       .put('/trabajador/updatePassword')
+//       .send({
+//         email: 'epostaezezaguna@langilea.com',
+//         contraseña: 'pasahitza2',
+//         contraseña_actual: 'pasahitza',
+//       })
 
-      expect(response.status).toBe(403)
-      expect(response.body).toHaveProperty('message','Trabajador no existe en la base de datos')
-  })
+//       expect(response.status).toBe(403)
+//       expect(response.body).toHaveProperty('message','Trabajador no existe en la base de datos')
+//   })
 
-  it('Cant update a Trabajador Password if password is incorrect', async () => {
-    const response = await request
-      .put('/trabajador/update')
-      .send({
-        email: 'eposta@langilea.com',
-        contraseña: 'pasahitza2',
-        contraseña_actual: 'pasahitzaokerra',
-      })
+//   it('Cant update a Trabajador Password if password is incorrect', async () => {
+//     const response = await request
+//       .put('/trabajador/updatePassword')
+//       .send({
+//         email: 'eposta@langilea.com',
+//         contraseña: 'pasahitza2',
+//         contraseña_actual: 'pasahitzaokerra',
+//       })
 
-      expect(response.status).toBe(401)
-      expect(response.body).toHaveProperty('message',"La contraseña actual es incorrecta")
-  })
+//       expect(response.status).toBe(401)
+//       expect(response.body).toHaveProperty('message',"La contraseña actual es incorrecta")
+//   })
 
-  it("Can't delete trabajador that doesn't exist", async () => {
-    const response = await request
-      .delete('/trabajador/delete/epostaezezaguna@langilea.com')
+//   it("Can't delete trabajador that doesn't exist", async () => {
+//     const response = await request
+//       .delete('/trabajador/delete/epostaezezaguna@langilea.com')
 
-    expect(response.status).toBe(500)
-    expect(response.body).toHaveProperty('message')
-  })
+//     expect(response.status).toBe(500)
+//     expect(response.body).toHaveProperty('message')
+//   })
 
-  it('Cant log in a Trabajador with incorrect email', async () => {
-    const response = await request
-      .post('/trabajador/login')
-      .send({ email: 'epostaezezaguna@langilea.com', contraseña: 'pasahitza2' })
+//   it('Cant log in a Trabajador with incorrect email', async () => {
+//     const response = await request
+//       .post('/trabajador/login')
+//       .send({ email: 'epostaezezaguna@langilea.com', contraseña: 'pasahitza2' })
 
-      expect(response.status).toBe(404)
-      expect(response.body).toHaveProperty('message',"User Not found.")
-  })
+//       expect(response.status).toBe(404)
+//       expect(response.body).toHaveProperty('message',"User Not found.")
+//   })
 
-  it('Cant log in a Trabajador with incorrect password', async () => {
-    const response = await request
-      .post('/trabajador/login')
-      .send({ email: 'eposta@langilea.com', contraseña: 'pasahitzaokerra' })
+//   it('Cant log in a Trabajador with incorrect password', async () => {
+//     const response = await request
+//       .post('/trabajador/login')
+//       .send({ email: 'eposta@langilea.com', contraseña: 'pasahitzaokerra' })
 
-      expect(response.status).toBe(401)
-      expect(response.body).toHaveProperty('message',"Invalid Password!")
-  })
+//       expect(response.status).toBe(401)
+//       expect(response.body).toHaveProperty('message',"Invalid Password!")
+//   })
 
-  // afterAll(async done => {
-  //   // Closing the DB connection allows Jest to exit successfully
-  //   await db.Sequelize.close
-  //   done();
-  // });
-})
+//   // afterAll(async done => {
+//   //   // Closing the DB connection allows Jest to exit successfully
+//   //   await db.Sequelize.close
+//   //   done();
+//   // });
+// })
 
 describe('Tests for Usuario', () => {
 
   let tokenVar = ''
 
-  // beforeAll(async () => {
-  //   await db.databaseConf.sync();
-  // });
+  beforeAll(async () => {
+    await db.databaseConf.sync();
+  });
 
   it('Create a Usuario', async () => {
     const data = {
@@ -209,13 +210,15 @@ describe('Tests for Usuario', () => {
       cp: 20800,
       provincia: 'Gipuzkoa',
       pais_origen: 'ES',
-      sedeId: 1,
+      sedeId: 2,
       trabajadorId: 'eposta@langilea.com',
       nacionalidad: [{ name: 'nacionalidad0', value: 'ES' }, { name: 'nacionalidad1', value: 'GB' }]
     };
     const response = await request
       .post('/usuario/create')
       .send({ data })
+
+    console.log(response)
 
     expect(response.status).toBe(200)
     expect(response.body).toHaveProperty('nombre', 'Usuario')
@@ -236,7 +239,7 @@ describe('Tests for Usuario', () => {
       cp: 20800,
       provincia: 'Gipuzkoa',
       pais_origen: 'ES',
-      sedeId: 1,
+      sedeId: 2,
       trabajadorId: 'eposta@langilea.com',
       nacionalidad: [{ name: 'nacionalidad0', value: 'ES' }, { name: 'nacionalidad1', value: 'GB' }]
     };
@@ -274,7 +277,7 @@ describe('Tests for Usuario', () => {
       cp: 20800,
       provincia: 'Gipuzkoa',
       pais_origen: 'ES',
-      sedeId: 1,
+      sedeId: 2,
       trabajadorId: 'eposta@langilea.com',
     };
     const response = await request
@@ -341,7 +344,7 @@ describe('Tests for Usuario', () => {
       cp: 20800,
       provincia: 'Gipuzkoa',
       pais_origen: 'ES',
-      sedeId: 1,
+      sedeId: 2,
       trabajadorId: 'eposta@langilea.com',
       nacionalidad: [{ name: 'nacionalidad0', value: 'ES' }]
     };
@@ -368,7 +371,7 @@ describe('Tests for Usuario', () => {
       cp: 20800,
       provincia: 'Gipuzkoa',
       pais_origen: 'ES',
-      sedeId: 1,
+      sedeId: 2,
       trabajadorId: 'eposta@langilea.com',
       nacionalidad: [{ name: 'nacionalidad0', value: 'ES' }]
     };
@@ -567,9 +570,9 @@ let extranjeriaId = 0;
 let trabajadoraHogarId = 0;
 
 describe('Tests for Caso', () => {
-  // beforeAll(async () => {
-  //   await db.databaseConf.sync();
-  // });
+  beforeAll(async () => {
+    await db.databaseConf.sync();
+  });
 
 
   it('Create a Caso Discriminación', async () => {
@@ -666,21 +669,21 @@ describe('Tests for Caso', () => {
     extranjeriaId = response.body.caso
   })
 
-  // it('Update a Caso Extranjeria', async () => {
-  //   const data = {
-  //     n_documentacion: '11111111A',
-  //     trabajadorId: 'eposta@langilea.com',
-  //     finalizado: false,
-  //     necesidad: ['necesidad3'],
-  //     proyectos: ['proyecto3']
-  //   };
-  //   const response = await request
-  //     .post('/caso/update/extranjeria/' + extranjeriaId)
-  //     .send({ data })
+  it('Update a Caso Extranjeria', async () => {
+    const data = {
+      n_documentacion: '11111111A',
+      trabajadorId: 'eposta@langilea.com',
+      finalizado: false,
+      necesidad: ['necesidad3'],
+      proyectos: ['proyecto3']
+    };
+    const response = await request
+      .post('/caso/update/extranjeria/' + extranjeriaId)
+      .send({ data })
 
-  //   expect(response.status).toBe(200)
-  //   expect(response.body).toHaveProperty('message', 'El caso ha sido actualizado correctamente.')
-  // })
+    expect(response.status).toBe(200)
+    expect(response.body).toHaveProperty('message', 'El caso ha sido actualizado correctamente.')
+  })
 
   it('Finalizar Caso Extranjeria by Id', async () => {
     const response = await request
@@ -910,65 +913,65 @@ describe('Tests for Intervencion', () => {
   })
 })
 
-describe('Delete created data', () => {
-  it('Deletes Caso Extranjeria by Id', async () => {
-    const response = await request
-      .delete('/caso/delete/' + extranjeriaId)
+// describe('Delete created data', () => {
+//   it('Deletes Caso Extranjeria by Id', async () => {
+//     const response = await request
+//       .delete('/caso/delete/' + extranjeriaId)
 
-    expect(response.status).toBe(200)
-    expect(response.body).toHaveProperty('message', "El caso ha sido eliminado correctamente.")
-  })
+//     expect(response.status).toBe(200)
+//     expect(response.body).toHaveProperty('message', "El caso ha sido eliminado correctamente.")
+//   })
 
-  it('Deletes Caso Discriminación by Id', async () => {
-    const response = await request
-      .delete('/caso/delete/' + discriminacionId)
+//   it('Deletes Caso Discriminación by Id', async () => {
+//     const response = await request
+//       .delete('/caso/delete/' + discriminacionId)
 
-    expect(response.status).toBe(200)
-    expect(response.body).toHaveProperty('message', "El caso ha sido eliminado correctamente.")
-  })
+//     expect(response.status).toBe(200)
+//     expect(response.body).toHaveProperty('message', "El caso ha sido eliminado correctamente.")
+//   })
 
-  it('Deletes Caso Trabajadora Hogar by Id', async () => {
-    const response = await request
-      .delete('/caso/delete/' + trabajadoraHogarId)
+//   it('Deletes Caso Trabajadora Hogar by Id', async () => {
+//     const response = await request
+//       .delete('/caso/delete/' + trabajadoraHogarId)
 
-    expect(response.status).toBe(200)
-    expect(response.body).toHaveProperty('message', "El caso ha sido eliminado correctamente.")
-  })
-  // it('Deletes trabajador by Email', async () => {
-  //   const response = await request
-  //     .delete('/trabajador/delete/eposta@langilea.com')
+//     expect(response.status).toBe(200)
+//     expect(response.body).toHaveProperty('message', "El caso ha sido eliminado correctamente.")
+//   })
+//   // it('Deletes trabajador by Email', async () => {
+//   //   const response = await request
+//   //     .delete('/trabajador/delete/eposta@langilea.com')
 
-  //   expect(response.status).toBe(200)
-  //   expect(response.body).toHaveProperty('message', "El trabajador ha sido eliminado correctamente.")
-  // })
-})
+//   //   expect(response.status).toBe(200)
+//   //   expect(response.body).toHaveProperty('message', "El trabajador ha sido eliminado correctamente.")
+//   // })
+// // })
 
-describe('With db connection closed', () => {
+// describe('With db connection closed', () => {
   
-  it('Create a Cita', async () => {
+//   it('Create a Cita', async () => {
 
-    const formData = {
-      fechaInicio: new Date(),
-      fechaFin: new Date(),
-      nombre: 'Nombre Cita',
-      notas: 'Notas de Cita',
-      trabajador: 'eposta@langilea.com',
-      usuario: '11111111A'
-    };
-    const response = await request
-      .post('/cita/create')
-      .send({ formData })
+//     const formData = {
+//       fechaInicio: new Date(),
+//       fechaFin: new Date(),
+//       nombre: 'Nombre Cita',
+//       notas: 'Notas de Cita',
+//       trabajador: 'eposta@langilea.com',
+//       usuario: '11111111A'
+//     };
+//     const response = await request
+//       .post('/cita/create')
+//       .send({ formData })
 
-    expect(response.status).toBe(500)
+//     expect(response.status).toBe(500)
 
 
-  })
+//   })
 
-  it('Deletes cita by Id', async () => {
-    const response = await request
-      .delete('/cita/delete/' + 0)
+//   it('Deletes cita by Id', async () => {
+//     const response = await request
+//       .delete('/cita/delete/' + 0)
 
-    expect(response.status).toBe(500)
-  })
+//     expect(response.status).toBe(500)
+//   })
 
-})
+// })

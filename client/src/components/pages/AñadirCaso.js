@@ -47,7 +47,7 @@ export default function AñadirCaso({user}) {
                 </div>
                 {/* DISCRIMINACIÓN */}
                 <div className="card mb-3">
-                    <div className="card-header text-white bg-secondary" onClick={onClickDiscriminacion}>Discriminación <i className="fas fa-arrow-down"></i></div>
+                    <div className="card-header text-white bg-secondary" id="showDiscriminacion" onClick={onClickDiscriminacion}>Discriminación <i className="fas fa-arrow-down"></i></div>
                     <div className={showDiscriminacion ? 'card-body' : 'hidden'} id="Discriminacion">
                         <DiscriminacionForm usuario={usuario.n_documentacion}/>
                     </div>

@@ -49,7 +49,7 @@ exports.create = (req, res) => {
     });
 };
 
-// Retrieve all Usuarios from the database.
+// Retrieve all Usuarios of worker from the database.
 exports.getAllUsuarios = (req, result) => {
   const email = req.params.email;
   jwt.verify(email, config.secret, (err, decoded) => {
@@ -65,6 +65,21 @@ exports.getAllUsuarios = (req, result) => {
   })
 };
 
+// Retrieve all Usuarios from the database.
+exports.getAllUsuariosOfDB = (req, result) => {
+  const email = req.params.email;
+  jwt.verify(email, config.secret, (err, decoded) => {
+    if (err) {
+      result.status(400).send({ auth: false, message: "No se ha podido autenticar usuario" });
+    } else {
+      db.databaseConf.query("SELECT Usuario.*, Nacionalidad.nacionalidad FROM Usuario LEFT OUTER JOIN Nacionalidad on Usuario.n_documentacion = Nacionalidad.n_documentacion").then(results => {
+        result.send(results[0])
+      }).catch(error => {
+        result.status(400).send(error)
+      })
+    }
+  })
+};
 // Retrieve Usuario with n_documentacion from the database.
 exports.getUsuarioWithDocumentacion = (req, result) => {
   const ndoc = req.params.ndoc;

@@ -10,6 +10,9 @@ import IconButton from '@material-ui/core/IconButton';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import CloseIcon from '@material-ui/icons/Close';
 import { authenticationService } from '../../_services';
+import Grid from '@material-ui/core/Grid';
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
 function Alert(props) {
 	return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
@@ -35,6 +38,8 @@ export default function AñadirUsuario({ usuario }) {
 	const [nacionalidades, setNacionalidades] = useState([])
 	const [telefonoExists, setTelefonoExists] = useState(false)
 
+	const MySwal = withReactContent(Swal)
+
 	useEffect(() => {
 		axios.get('http://localhost:8080/sedes/all').then(res => {
 			setSedes(res.data);
@@ -49,12 +54,12 @@ export default function AñadirUsuario({ usuario }) {
 			trabajadorId: currentUser.email
 		}
 		return isAddMode
-			? createUser(data)
+			? createUser(data,e)
 			: updateUser(usuario, data);
 
 	}
 
-	const createUser = (data) => {
+	const createUser = (data,e) => {
 		data = {
 			...data,
 			nacionalidad: nacionalidades
@@ -64,6 +69,8 @@ export default function AñadirUsuario({ usuario }) {
 		}).catch(error => {
 			setError(true)
 		})
+		e.preventDefault();
+		e.target.reset();
 	}
 
 	const updateUser = (usr, data) => {
@@ -137,6 +144,54 @@ export default function AñadirUsuario({ usuario }) {
 		setNacionalidades(nacionalidadesVar)
 	}
 
+	const eliminarUsuario = () => {
+        MySwal.fire({
+            title: 'Estas segura?',
+            text: "Este usuario será eliminado!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            confirmButtonText: 'Si, eliminar!',
+            cancelButtonText: 'No, cancelar!!',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                axios.delete('http://localhost:8080/usuario/delete/{id}'.replace('{id}', usuario))
+                    .then(res => {
+                        MySwal.fire(
+                            'Eliminado!',
+                            'El usuario ha sido eliminado.',
+                            'success'
+                        )
+                        window.history.back()
+                    })
+                    .catch(err => {
+                        MySwal.fire(
+                            'Ha habido algun error!',
+                            'El usuario no se ha eliminado.',
+                            'warning'
+                        )
+                    })
+
+            } else if (
+                /* Read more about handling dismissals below */
+                result.dismiss === Swal.DismissReason.cancel
+            ) {
+                MySwal.fire(
+                    'Cancelado',
+                    'El usuario no se ha eliminado :)',
+                    'error'
+                )
+            }
+        })
+    }
+
+    const isEditMode = () => {
+        return (
+            <button type="button" name="eliminarUsuario" className="btn btn-danger" onClick={eliminarUsuario}>Eliminar Usuario <i className='fa fa-trash'></i></button>
+        )
+    }
+
 	useEffect(() => { getUser() }, []);
 
 	return (
@@ -145,7 +200,14 @@ export default function AñadirUsuario({ usuario }) {
 			<Menu />
 			<div className="container padding25">
 				<form onSubmit={handleSubmit(onSubmit)}>
-					<h3>{isAddMode ? 'Añadir Usuario' : 'Actualizar usuario'}</h3>
+					<Grid container spacing={3}>
+                        <Grid item xs={10}>
+                            <h3>{isAddMode ? 'Añadir Usuario' : 'Actualizar Usuario'}</h3>
+                        </Grid>
+                        <Grid item xs={2}>
+                            {isAddMode ? null : isEditMode()}
+                        </Grid>
+                    </Grid>
 					<div className="card mb-3">
 						<div className="card-header text-white bg-secondary">Información personal</div>
 						<div className="card-body">
@@ -373,13 +435,13 @@ export default function AñadirUsuario({ usuario }) {
 
 					<button type="submit" name="submit" className="btn btn-primary">{isAddMode ? 'Añadir Usuario' : 'Actualizar usuario'}</button>
 
-					<Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+					<Snackbar open={open} autoHideDuration={6000} id="successAlert" onClose={handleClose}>
 						<Alert onClose={handleClose} severity="success">
 							El usuario ha sido {isAddMode ? 'añadido' : 'actualizado'} correctamente!
         				</Alert>
 					</Snackbar>
 
-					<Snackbar open={error} autoHideDuration={6000} onClose={handleClose}>
+					<Snackbar open={error} autoHideDuration={6000} id="errorAlert" onClose={handleClose}>
 						<Alert onClose={handleClose} severity="error">
 							Ha habido algun error {isAddMode ? 'añadiendo' : 'actualizando'} el usuario!
         				</Alert>

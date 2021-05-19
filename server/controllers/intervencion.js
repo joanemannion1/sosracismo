@@ -21,14 +21,7 @@ var upload = multer({
 // Create an Intervencion
 exports.createDoc = (req, res) => {
     {
-        if (!req.body.casoId) {
-            res.status(400).send({
-              message: "Contenido no puede estar vacio!"
-            });
-            return;
-          }
-
-        upload(req, res, (err) => {
+            upload(req, res, (err) => {
             if (err) {
                 res.status(400).send("Something went wrong!");
             }
@@ -66,6 +59,48 @@ exports.createDoc = (req, res) => {
 
 }
 
+// Create an Intervencion
+exports.update = (req, res) => {
+    {
+        const id = req.params.id;
+            upload(req, res, (err) => {
+            if (err) {
+                res.status(400).send("Something went wrong!");
+            }
+            const intervencion = {
+                nombre: req.body.nombre,
+                descripcion: req.body.descripcion,
+            };
+            Intervencion.update(intervencion, {
+                where: { id: id }
+              })
+                .then(data => {
+                    if(req.files) {
+                        req.files.map(file => {
+                        var doc = {
+                            intervencionId: id,
+                            nombre: file.originalname,
+                            type: file.mimetype,
+                            file_path: file.path,
+                        }
+                        Documento.create(doc).then(data => {
+                        })
+                    })
+                    }
+                    
+                    res.send({message: "La intervencion ha sido añadida", data: data})
+                })
+                .catch(err => {
+                    res.status(500).send({
+                        message:
+                            err.message || "Ha habido algun error creando la intervención."
+                    });
+                });
+        })
+    }
+
+}
+
 //Download File
 exports.downloadFileByName = (req, res) => {
     try {
@@ -76,9 +111,6 @@ exports.downloadFileByName = (req, res) => {
             },
             attributes: ['file_path', 'type']
         }).then(data => {
-            // res.set({
-            //     'Content-Type': data[0].type
-            // });
             res.sendFile(path.resolve(__dirname + '/../' + data[0].file_path))
         }).catch(error => {
             res.status(400).send(error)
@@ -89,10 +121,23 @@ exports.downloadFileByName = (req, res) => {
     }
 };
 
-//Download File
+// Get all intervenciones of caso
 exports.getAllByCaso = (req, res) => {
     var id = req.params.casoId;
     db.databaseConf.query("SELECT Intervencion.*, Documentos.id AS docId, Documentos.nombre AS docNombre, Documentos.type AS type FROM Intervencion LEFT OUTER JOIN Documentos on Intervencion.id = Documentos.intervencionId WHERE casoId = " + id).then(results => {
+        res.send(results[0])
+    }).catch(err => {
+        res.status(500).send({
+          message:
+            err.message || "Ha habido algun error obteniendo las intervenciones."
+        });
+      });
+};
+
+//Download File
+exports.getById = (req, res) => {
+    var id = req.params.id;
+    db.databaseConf.query("SELECT Intervencion.*, Documentos.id AS docId, Documentos.nombre AS docNombre, Documentos.type AS type FROM Intervencion LEFT OUTER JOIN Documentos on Intervencion.id = Documentos.intervencionId WHERE Intervencion.id = " + id).then(results => {
         res.send(results[0])
     }).catch(err => {
         res.status(500).send({

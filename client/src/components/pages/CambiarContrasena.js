@@ -35,7 +35,7 @@ export default function CambiarContrasena() {
     };
 
     const onSubmit = (data, e) => {
-        axios.put('http://localhost:8080/trabajador/update', {
+        axios.put('http://localhost:8080/trabajador/updatePassword', {
             email: data.email,
             contraseña_actual: data.contraseña_actual,
             contraseña: data.nueva_contraseña,
